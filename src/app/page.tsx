@@ -285,7 +285,7 @@ export default function LandingPage() {
                   <hr />
                   <div className="lp-polas">
                     {['-6deg','3deg','7deg'].map((r,i)=>(
-                      <div key={i} className="lp-pola" style={{'--r':r} as React.CSSProperties}>
+                      <div key={i} className="lp-pola" style={{ transform:`rotate(${r})` }}>
                         <div className="ph">{['♥','❀','✿'][i]}</div>
                       </div>
                     ))}
@@ -304,7 +304,7 @@ export default function LandingPage() {
                     ))}
                   </div>
                   <hr />
-                  <p className="lp-letter-q">"Você é a pessoa que transforma qualquer lugar em lar. Cada instante ao seu lado me faz querer viver mais intensamente…"</p>
+                  <p className="lp-letter-q">&ldquo;Você é a pessoa que transforma qualquer lugar em lar. Cada instante ao seu lado me faz querer viver mais intensamente…&rdquo;</p>
                   <p className="lp-letter-sign">para sempre e um dia a mais ♥</p>
                   <div className="lp-spfy">
                     <div className="cover">♪</div>
