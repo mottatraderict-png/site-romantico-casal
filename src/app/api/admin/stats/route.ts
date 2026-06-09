@@ -92,10 +92,10 @@ export async function POST(req: NextRequest) {
     countCasais('publicado', hoje),
     topReferrers(desde),
     admin.from('casais')
-      .select(`nome1, nome2, status, email_cliente, ${dateCol}, slug`)
+      .select('*')
       .order(dateCol, { ascending: false })
       .limit(15)
-      .then(r => (r.data ?? []).map((p: Record<string, unknown>) => ({
+      .then(r => ((r.data ?? []) as Record<string, unknown>[]).map((p) => ({
         nome1: p.nome1, nome2: p.nome2, status: p.status,
         email_cliente: p.email_cliente, slug: p.slug,
         created_at: p[dateCol],
