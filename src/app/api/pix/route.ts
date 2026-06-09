@@ -154,8 +154,9 @@ export async function POST(req: NextRequest) {
       paymentId:   payment.id,
     })
 
-  } catch (err) {
+  } catch (err: any) {
     console.error('[pix] erro:', err)
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    const errorMsg = err?.message || (err?.response?.message) || (typeof err === 'object' ? JSON.stringify(err) : String(err))
+    return NextResponse.json({ error: errorMsg }, { status: 500 })
   }
 }
