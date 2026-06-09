@@ -163,6 +163,11 @@ export default function PagarClient({ casalId, nome1, nome2, email }: PagarProps
                     {timeLeft !== null && <b style={{ color: 'var(--rose)', marginLeft: 8 }}>(Expira em {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')})</b>}
                   </span>
                 </div>
+                {ticketUrl && (
+                  <a href={ticketUrl} target="_blank" rel="noopener noreferrer" className="ck-ticket-link" style={{ display: 'block', marginTop: 16 }}>
+                    Abrir página do PIX no Mercado Pago →
+                  </a>
+                )}
               </div>
             </>
           )}
