@@ -173,16 +173,18 @@ export async function POST(req: NextRequest) {
       paymentId:   payment.id,
     })
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[pix] erro:', err)
     
     // Melhor extração do erro do Mercado Pago
-    let errorMsg = err.message || 'Erro desconhecido ao gerar PIX'
-    if (err.cause && Array.isArray(err.cause)) {
-      const causes = err.cause.map((c: any) => c.description).join(', ')
+    const e = err as { message?: string; cause?: Array<{ description?: string }>; response?: { message?: string } }
+    let errorMsg = e.message || 'Erro desconhecido ao gerar PIX'
+    
+    if (e.cause && Array.isArray(e.cause)) {
+      const causes = e.cause.map(c => c.description).filter(Boolean).join(', ')
       if (causes) errorMsg += ` - Detalhes: ${causes}`
-    } else if (err.response?.message) {
-      errorMsg = err.response.message
+    } else if (e.response?.message) {
+      errorMsg = e.response.message
     }
 
     return NextResponse.json({ error: errorMsg }, { status: 500 })
