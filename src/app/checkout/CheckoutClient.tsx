@@ -60,6 +60,9 @@ export default function CheckoutClient({
           clearInterval(pollRef.current!)
           setStage('pix-confirmed')
           pixelTrack('Purchase', { value: 19.90, currency: 'BRL' })
+          try {
+            localStorage.removeItem('form_casal_draft')
+          } catch {}
           setTimeout(() => {
             window.location.href = `/sucesso?casal_id=${casalId}`
           }, 2000)
@@ -114,6 +117,9 @@ export default function CheckoutClient({
         if (!res.ok || !json.checkoutUrl) throw new Error(json.error ?? 'Erro ao gerar pagamento')
 
         pixelTrack('InitiateCheckout', { value: 19.90, currency: 'BRL' })
+        try {
+          localStorage.removeItem('form_casal_draft')
+        } catch {}
         window.location.href = `/sucesso?casal_id=${json.casalId}&mp=${encodeURIComponent(json.checkoutUrl)}`
       }
     } catch (err) {

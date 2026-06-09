@@ -69,6 +69,73 @@ export default function FormularioClient() {
   const [musicaNome,      setMusicaNome]      = useState('')
   const [musicaArtista,   setMusicaArtista]   = useState('')
 
+  // ── RASCUNHO (LOCALSTORAGE) ──────────────────────────────────
+  // Carrega o rascunho após a montagem do componente (evita erros de SSR)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('form_casal_draft')
+      if (saved) {
+        const draft = JSON.parse(saved)
+        if (draft.nome1) setNome1(draft.nome1)
+        if (draft.nome2) setNome2(draft.nome2)
+        if (draft.apelido1) setApelido1(draft.apelido1)
+        if (draft.apelido2) setApelido2(draft.apelido2)
+        if (draft.dataInicio) setDataInicio(draft.dataInicio)
+        if (draft.frase) setFrase(draft.frase)
+        if (draft.marcos && draft.marcos.length > 0) {
+          const cleanMarcos = draft.marcos.map((m: any) => ({
+            data: m.data ?? '',
+            titulo: m.titulo ?? '',
+            desc: m.desc ?? ''
+          }))
+          setMarcos(cleanMarcos)
+          setMarcoFiles(Array(cleanMarcos.length).fill(null))
+        }
+        if (draft.modoIA !== undefined) setModoIA(draft.modoIA)
+        if (draft.q1) setQ1(draft.q1)
+        if (draft.q2) setQ2(draft.q2)
+        if (draft.q3) setQ3(draft.q3)
+        if (draft.tom) setTom(draft.tom)
+        if (draft.cartaGerada) {
+          setCartaGerada(draft.cartaGerada)
+          setIaVisible(true)
+        }
+        if (draft.cartaTexto) setCartaTexto(draft.cartaTexto)
+        if (draft.cartaPara) setCartaPara(draft.cartaPara)
+        if (draft.cartaAss) setCartaAss(draft.cartaAss)
+        if (draft.spotifyUrl) {
+          setSpotifyUrl(draft.spotifyUrl)
+          const match = draft.spotifyUrl.match(/track\/([a-zA-Z0-9]+)/)
+          setSpotifyTrackId(match ? match[1] : '')
+        }
+        if (draft.musicaNome) setMusicaNome(draft.musicaNome)
+        if (draft.musicaArtista) setMusicaArtista(draft.musicaArtista)
+        if (draft.step !== undefined) setStep(draft.step)
+      }
+    } catch (e) {
+      console.error('Erro ao ler rascunho:', e)
+    }
+  }, [])
+
+  // Salva automaticamente a cada alteração de estado relevante
+  useEffect(() => {
+    const draft = {
+      nome1, nome2, apelido1, apelido2, dataInicio, frase,
+      marcos: marcos.map(m => ({ data: m.data, titulo: m.titulo, desc: m.desc })),
+      modoIA, q1, q2, q3, tom, cartaGerada, cartaTexto, cartaPara, cartaAss,
+      spotifyUrl, musicaNome, musicaArtista, step
+    }
+    try {
+      localStorage.setItem('form_casal_draft', JSON.stringify(draft))
+    } catch (e) {
+      console.error('Erro ao salvar rascunho:', e)
+    }
+  }, [
+    nome1, nome2, apelido1, apelido2, dataInicio, frase, marcos,
+    modoIA, q1, q2, q3, tom, cartaGerada, cartaTexto, cartaPara, cartaAss,
+    spotifyUrl, musicaNome, musicaArtista, step
+  ])
+
   // Step 6 — contact/payment handled by CheckoutClient
 
   // ── FOTOS ────────────────────────────────────────────────────
