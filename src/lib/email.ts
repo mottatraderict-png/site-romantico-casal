@@ -4,8 +4,18 @@ function getResend() {
   return new Resend(process.env.RESEND_API_KEY)
 }
 
-const FROM = () => process.env.RESEND_FROM ?? 'contato@seudominio.com.br'
-const BASE_URL = () => process.env.NEXT_PUBLIC_URL ?? 'https://seudominio.com.br'
+const FROM = () => (process.env.RESEND_FROM || 'contato@cartadeamor.site').trim()
+const BASE_URL = () => {
+  let rawUrl = (process.env.NEXT_PUBLIC_URL || '').trim()
+  if (!rawUrl) {
+    const vercelUrl = (process.env.VERCEL_URL || '').trim()
+    rawUrl = vercelUrl ? `https://${vercelUrl}` : 'https://cartadeamor.site'
+  }
+  if (!rawUrl.startsWith('http')) {
+    rawUrl = `https://${rawUrl}`
+  }
+  return rawUrl.replace(/\/$/, '')
+}
 
 export async function enviarEmailPagina(
   email: string,
