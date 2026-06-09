@@ -16,9 +16,11 @@ interface Stats {
     acessoParaForm: number; formParaCheckout: number
     checkoutParaPago: number; acessoParaPago: number
   }
+  referrers: { fonte: string; total: number }[]
   ultimosPedidos: { nome1: string; nome2: string; status: string; email_cliente: string; created_at: string; slug: string }[]
   eventosOk?: boolean
   eventosErro?: string
+  pedidosErro?: string
 }
 
 const RANGES = [
@@ -113,9 +115,16 @@ export default function AdminClient() {
             <p style={{ color: C.amber, fontSize: 14, fontWeight: 600, marginBottom: 6 }}>⚠ Tracking de funil inativo</p>
             <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.6 }}>
               A tabela <code style={{ color: C.text }}>eventos</code> não foi encontrada no Supabase, então
-              acessos / formulário / checkout aparecem zerados. Rode o SQL de <code style={{ color: C.text }}>supabase/eventos.sql</code> no
-              SQL Editor do Supabase para ativar. (Pedidos pagos continuam funcionando normalmente.)
+              acessos / formulário / checkout / origem aparecem zerados. Rode o SQL de <code style={{ color: C.text }}>supabase/eventos.sql</code> no
+              SQL Editor do Supabase para ativar. (Os acessos também estão no Vercel Analytics.)
             </p>
+          </div>
+        )}
+
+        {stats && !loading && stats.pedidosErro && (
+          <div style={{ background: 'rgba(224,80,112,0.12)', border: `1px solid ${C.rose}`, borderRadius: 12, padding: '16px 20px', marginBottom: 20 }}>
+            <p style={{ color: C.rose, fontSize: 14, fontWeight: 600, marginBottom: 6 }}>⚠ Erro ao ler pedidos</p>
+            <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.6 }}>{stats.pedidosErro}</p>
           </div>
         )}
 
@@ -161,6 +170,31 @@ export default function AdminClient() {
               ))}
               <p style={{ fontSize: 12, color: C.muted, marginTop: 16, paddingTop: 16, borderTop: `1px solid ${C.border}` }}>
                 Conversão total (acesso → pago): <strong style={{ color: C.green }}>{t ? pct(t.acessoParaPago) : '—'}</strong>
+              </p>
+            </div>
+
+            {/* De onde vieram */}
+            <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 24, marginBottom: 28 }}>
+              <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>De onde vieram</h2>
+              <p style={{ fontSize: 12, color: C.muted, marginBottom: 18 }}>Origem dos acessos no período</p>
+              {(stats.referrers ?? []).length === 0 ? (
+                <p style={{ fontSize: 13, color: C.muted }}>Sem dados de origem ainda.</p>
+              ) : (() => {
+                const maxRef = Math.max(...stats.referrers.map(r => r.total), 1)
+                return stats.referrers.map((r, i) => (
+                  <div key={i} style={{ marginBottom: 12 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 5 }}>
+                      <span>{r.fonte}</span>
+                      <span style={{ color: C.muted }}>{r.total.toLocaleString('pt-BR')}</span>
+                    </div>
+                    <div style={{ height: 8, background: C.bg, borderRadius: 99, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${Math.max(2, r.total / maxRef * 100)}%`, background: C.roseLight, borderRadius: 99 }} />
+                    </div>
+                  </div>
+                ))
+              })()}
+              <p style={{ fontSize: 11, color: C.muted, marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
+                💡 Dados detalhados de origem também no painel do Vercel Analytics → Referrers.
               </p>
             </div>
 
