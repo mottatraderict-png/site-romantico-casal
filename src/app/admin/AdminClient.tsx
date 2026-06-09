@@ -33,73 +33,37 @@ const C = {
 }
 
 export default function AdminClient() {
-  const [password, setPassword] = useState('')
-  const [authed, setAuthed] = useState(false)
   const [days, setDays] = useState(30)
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const fetchStats = useCallback(async (pwd: string, rangeDays: number) => {
+  const fetchStats = useCallback(async (rangeDays: number) => {
     setLoading(true); setError('')
     try {
       const res = await fetch('/api/admin/stats', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pwd, days: rangeDays }),
+        body: JSON.stringify({ days: rangeDays }),
       })
       const json = await res.json()
-      if (!res.ok) { setError(json?.error ?? 'Senha incorreta'); setAuthed(false); setLoading(false); return }
-      setStats(json); setAuthed(true)
-      try { sessionStorage.setItem('rc_admin_pwd', pwd) } catch {}
+      if (!res.ok) { setError(json?.error ?? 'Erro ao carregar'); setLoading(false); return }
+      setStats(json)
     } catch {
       setError('Erro ao carregar dados')
     } finally { setLoading(false) }
   }, [])
 
-  // Restaura sessão
-  useEffect(() => {
-    try {
-      const saved = sessionStorage.getItem('rc_admin_pwd')
-      if (saved) { setPassword(saved); fetchStats(saved, 30) }
-    } catch {}
-  }, [fetchStats])
-
-  function login(e: React.FormEvent) {
-    e.preventDefault()
-    fetchStats(password, days)
-  }
+  // Carrega ao montar
+  useEffect(() => { fetchStats(30) }, [fetchStats])
 
   function changeRange(d: number) {
     setDays(d)
-    fetchStats(password, d)
+    fetchStats(d)
   }
 
   const money = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
   const pct = (v: number) => `${v.toFixed(1)}%`
-
-  // ── LOGIN ─────────────────────────────────────────────────
-  if (!authed) {
-    return (
-      <div style={{ minHeight: '100vh', background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui, sans-serif', padding: 24 }}>
-        <form onSubmit={login} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: 40, width: '100%', maxWidth: 360, textAlign: 'center' }}>
-          <div style={{ fontSize: 40, marginBottom: 16 }}>🌹</div>
-          <h1 style={{ color: C.text, fontSize: 20, fontWeight: 600, marginBottom: 6 }}>Painel Administrativo</h1>
-          <p style={{ color: C.muted, fontSize: 13, marginBottom: 24 }}>Romântico do Casal</p>
-          <input
-            type="password" value={password} onChange={e => setPassword(e.target.value)}
-            placeholder="Senha de administrador" autoFocus
-            style={{ width: '100%', height: 46, background: C.bg, border: `1px solid ${C.border}`, borderRadius: 10, padding: '0 14px', color: C.text, fontSize: 14, outline: 'none', marginBottom: 12 }}
-          />
-          {error && <p style={{ color: C.rose, fontSize: 13, marginBottom: 12 }}>⚠ {error}</p>}
-          <button type="submit" disabled={loading}
-            style={{ width: '100%', height: 46, background: C.rose, border: 'none', borderRadius: 10, color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', opacity: loading ? 0.6 : 1 }}>
-            {loading ? 'Entrando...' : 'Entrar'}
-          </button>
-        </form>
-      </div>
-    )
-  }
 
   // ── DASHBOARD ─────────────────────────────────────────────
   const f = stats?.funil
@@ -140,6 +104,7 @@ export default function AdminClient() {
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: 24 }}>
         {loading && <p style={{ color: C.muted, textAlign: 'center', padding: 40 }}>Carregando...</p>}
+        {error && <p style={{ color: C.rose, textAlign: 'center', padding: 40 }}>⚠ {error}</p>}
 
         {stats && !loading && (
           <>

@@ -7,15 +7,7 @@ function isoDaysAgo(days: number) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}))
-  const password = String(body?.password ?? '').trim()
-  const expected = (process.env.ADMIN_PASSWORD ?? '').trim()
-
-  if (!expected) {
-    return NextResponse.json({ error: 'ADMIN_PASSWORD não configurada no servidor. Defina a variável na Vercel e faça redeploy.' }, { status: 500 })
-  }
-  if (password !== expected) {
-    return NextResponse.json({ error: 'Senha incorreta' }, { status: 401 })
-  }
+  // Acesso livre — sem senha
 
   const admin = getSupabaseAdmin()
   const range = Number(body?.days) || 30 // janela em dias
