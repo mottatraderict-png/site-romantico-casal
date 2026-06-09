@@ -165,49 +165,46 @@ export async function POST(req: NextRequest) {
       else console.log('[checkout] fotos inseridas ok:', fotosUploaded.length)
     }
 
-    // Upload das fotos de marcos
+    // Upload das fotos de marcos — itera por índice original (evita parar em gaps)
+    const marcos = JSON.parse(marcosJson) as { data: string; titulo: string; desc: string }[]
     const marcoFotoUrls: Record<number, string> = {}
-    let marcoFotoIdx = 0
-    while (formData.has(`marco_foto_${marcoFotoIdx}`)) {
-      const file = formData.get(`marco_foto_${marcoFotoIdx}`) as File
+    for (let i = 0; i < marcos.length; i++) {
+      const file = formData.get(`marco_foto_${i}`) as File | null
       if (file && file.size > 0) {
         const ext = file.name.split('.').pop() ?? 'jpg'
-        const path = `temp-${Date.now()}/marco_${marcoFotoIdx}.${ext}`
+        const path = `temp-${Date.now()}/marco_${i}.${ext}`
         const buffer = Buffer.from(await file.arrayBuffer())
         const { data: mData, error: mErr } = await admin.storage
           .from('fotos-casais')
           .upload(path, buffer, { contentType: file.type, upsert: true })
         if (!mErr && mData) {
           const { data: mPub } = admin.storage.from('fotos-casais').getPublicUrl(mData.path)
-          marcoFotoUrls[marcoFotoIdx] = mPub.publicUrl
-          console.log(`[checkout] marco_foto_${marcoFotoIdx} ok`)
+          marcoFotoUrls[i] = mPub.publicUrl
+          console.log(`[checkout] marco_foto_${i} ok`)
         } else if (mErr) {
-          console.error(`[checkout] erro marco_foto_${marcoFotoIdx}:`, JSON.stringify(mErr))
+          console.error(`[checkout] erro marco_foto_${i}:`, JSON.stringify(mErr))
         }
       }
-      marcoFotoIdx++
     }
 
-      // Inserir marcos
-      const marcos = JSON.parse(marcosJson) as { data: string; titulo: string; desc: string }[]
-      const marcosValidos = marcos.filter((m) => m.titulo.trim())
-      if (marcosValidos.length > 0) {
-        const { error: marcosError } = await admin.from('marcos').insert(
-          marcosValidos.map((m, i) => ({
-            casal_id: casal_id,
-            data_texto: m.data.trim() || null,
-            titulo: m.titulo.trim(),
-            descricao: m.desc.trim() || null,
-            foto_url: marcoFotoUrls[i] || null,
-            ordem: i,
-          }))
-        )
-        if (marcosError) {
-          console.error('[checkout] erro insert marcos:', JSON.stringify(marcosError))
-        } else {
-          console.log('[checkout] marcos inseridos ok:', marcosValidos.length)
-        }
-      }
+    // Mantém índice original para mapear foto corretamente (não re-numera após filter)
+    const marcosInsert = marcos
+      .map((m, i) => ({ m, i }))
+      .filter(({ m }) => m.titulo.trim())
+      .map(({ m, i }, ordem) => ({
+        casal_id: casal_id,
+        data_texto: m.data.trim() || null,
+        titulo: m.titulo.trim(),
+        descricao: m.desc.trim() || null,
+        foto_url: marcoFotoUrls[i] || null,  // índice ORIGINAL
+        ordem,
+      }))
+
+    if (marcosInsert.length > 0) {
+      const { error: marcosError } = await admin.from('marcos').insert(marcosInsert)
+      if (marcosError) console.error('[checkout] erro insert marcos:', JSON.stringify(marcosError))
+      else console.log('[checkout] marcos inseridos ok:', marcosInsert.length)
+    }
     }
 
     // Criar preferência MP com external_reference = casal.id para o webhook achar o casal

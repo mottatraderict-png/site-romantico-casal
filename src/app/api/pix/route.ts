@@ -118,33 +118,39 @@ export async function POST(req: NextRequest) {
       }
 
       // ── Fotos de marcos + marcos ──────────────────────────────
+      const marcos = JSON.parse(marcosJson) as { data: string; titulo: string; desc: string }[]
       const marcoFotoUrls: Record<number, string> = {}
-      let mfi = 0
-      while (formData.has(`marco_foto_${mfi}`)) {
-        const file = formData.get(`marco_foto_${mfi}`) as File
+
+      // Itera pelo índice ORIGINAL dos marcos (não while — evita parar em gaps)
+      for (let i = 0; i < marcos.length; i++) {
+        const file = formData.get(`marco_foto_${i}`) as File | null
         if (file && file.size > 0) {
           const ext = file.name.split('.').pop() ?? 'jpg'
-          const path = `temp-${Date.now()}/marco_${mfi}.${ext}`
+          const path = `temp-${Date.now()}/marco_${i}.${ext}`
           const buffer = Buffer.from(await file.arrayBuffer())
           const { data: mData, error: mErr } = await admin.storage.from('fotos-casais').upload(path, buffer, { contentType: file.type, upsert: true })
           if (!mErr && mData) {
             const { data: mPub } = admin.storage.from('fotos-casais').getPublicUrl(mData.path)
-            marcoFotoUrls[mfi] = mPub.publicUrl
+            marcoFotoUrls[i] = mPub.publicUrl
           }
         }
-        mfi++
       }
-      const marcos = JSON.parse(marcosJson) as { data: string; titulo: string; desc: string }[]
-      const marcosValidos = marcos.filter(m => m.titulo.trim())
-      if (marcosValidos.length > 0) {
-        await admin.from('marcos').insert(marcosValidos.map((m, i) => ({
+
+      // Mantém índice original para mapear foto corretamente (não re-numera após filter)
+      const marcosInsert = marcos
+        .map((m, i) => ({ m, i }))
+        .filter(({ m }) => m.titulo.trim())
+        .map(({ m, i }, ordem) => ({
           casal_id,
           data_texto: m.data.trim() || null,
           titulo: m.titulo.trim(),
           descricao: m.desc.trim() || null,
-          foto_url: marcoFotoUrls[i] || null,
-          ordem: i,
-        })))
+          foto_url: marcoFotoUrls[i] || null,   // usa índice ORIGINAL
+          ordem,
+        }))
+
+      if (marcosInsert.length > 0) {
+        await admin.from('marcos').insert(marcosInsert)
       }
     }
 
