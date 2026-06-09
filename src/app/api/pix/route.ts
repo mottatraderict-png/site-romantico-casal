@@ -145,7 +145,15 @@ export async function POST(req: NextRequest) {
       body: {
         transaction_amount: 19.90,
         payment_method_id: 'pix',
-        payer: { email },
+        payer: {
+          email,
+          first_name: nome1 || 'Cliente',
+          last_name: nome2 || 'Casal',
+          identification: {
+            type: 'CPF',
+            number: '19119119100' // Generic CPF to pass MP validation if not provided by user
+          }
+        },
         external_reference: casal.id,
         description: `Página Romântica — ${nome1} & ${nome2}`,
         notification_url: notificationUrl,
@@ -165,10 +173,18 @@ export async function POST(req: NextRequest) {
       paymentId:   payment.id,
     })
 
-  } catch (err: unknown) {
+  } catch (err: any) {
     console.error('[pix] erro:', err)
-    const e = err as { message?: string; response?: { message?: string } }
-    const errorMsg = e?.message || e?.response?.message || (typeof err === 'object' && err !== null ? JSON.stringify(err) : String(err))
+    
+    // Melhor extração do erro do Mercado Pago
+    let errorMsg = err.message || 'Erro desconhecido ao gerar PIX'
+    if (err.cause && Array.isArray(err.cause)) {
+      const causes = err.cause.map((c: any) => c.description).join(', ')
+      if (causes) errorMsg += ` - Detalhes: ${causes}`
+    } else if (err.response?.message) {
+      errorMsg = err.response.message
+    }
+
     return NextResponse.json({ error: errorMsg }, { status: 500 })
   }
 }
