@@ -121,7 +121,9 @@ export default function LandingPage() {
 
   // mensagens + fotos flutuantes
   useEffect(()=>{
-    const layer = floatRef.current; if(!layer) return
+    const layer = floatRef.current
+    if(!layer) return
+    const host: HTMLDivElement = layer
     function spawnMsg(){
       if(document.hidden) return
       const p = PHRASES[(Math.random()*PHRASES.length)|0]
@@ -133,7 +135,7 @@ export default function LandingPage() {
       el.style.fontSize=(13+Math.random()*5)+'px'
       el.style.setProperty('--drift',((Math.random()-0.5)*70).toFixed(0)+'px')
       el.style.setProperty('--rot',((Math.random()-0.5)*16).toFixed(0)+'deg')
-      layer.appendChild(el)
+      host.appendChild(el)
       el.addEventListener('animationend',()=>el.remove())
       setTimeout(()=>{ if(el.isConnected)el.remove() },(dur+1)*1000)
     }
@@ -155,7 +157,7 @@ export default function LandingPage() {
       el.style.animationDuration=dur+'s'
       el.style.setProperty('--drift',((Math.random()-0.5)*60).toFixed(0)+'px')
       el.style.setProperty('--rot',((Math.random()-0.5)*20).toFixed(0)+'deg')
-      layer.appendChild(el)
+      host.appendChild(el)
       el.addEventListener('animationend',()=>el.remove())
       setTimeout(()=>{ if(el.isConnected)el.remove() },(dur+1)*1000)
     }
