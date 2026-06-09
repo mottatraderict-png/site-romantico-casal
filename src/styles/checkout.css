@@ -265,3 +265,90 @@
   .ck-topbar { padding: 0 16px; }
   .ck-step span { display: none; }
 }
+
+/* ── TELA PIX QR CODE ─────────────────────────────────────── */
+.ck-pix-screen {
+  max-width: 480px; margin: 40px auto; padding: 0 20px 60px;
+}
+.ck-pix-header { text-align: center; margin-bottom: 28px; }
+.ck-pix-header h2 {
+  font-family: var(--serif); font-size: 30px; font-weight: 300;
+  color: var(--text); margin-bottom: 8px;
+}
+.ck-pix-header h2 span { color: var(--rose); }
+.ck-pix-header p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+.ck-pix-body {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 32px 24px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  display: flex; flex-direction: column; align-items: center; gap: 24px;
+}
+
+.ck-qr-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.ck-qr-img {
+  width: 220px; height: 220px; border-radius: 12px;
+  border: 6px solid #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.ck-qr-placeholder {
+  width: 220px; height: 220px; border-radius: 12px;
+  background: var(--bg); border: 2px dashed var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px; color: var(--text-muted);
+}
+.ck-qr-amount {
+  font-family: var(--serif); font-size: 28px; font-weight: 300;
+  color: var(--rose); letter-spacing: .02em;
+}
+
+.ck-copy-wrap { width: 100%; }
+.ck-copy-label { font-size: 11px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+.ck-copy-row { display: flex; gap: 8px; }
+.ck-copy-input {
+  flex: 1; height: 44px; background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 0 12px; font-size: 12px; color: var(--text-muted);
+  outline: none; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ck-copy-btn {
+  height: 44px; padding: 0 18px; border-radius: 8px; border: none; cursor: pointer;
+  background: var(--rose); color: #fff; font-size: 12px; font-weight: 600;
+  letter-spacing: .05em; white-space: nowrap; transition: opacity .2s;
+}
+.ck-copy-btn:hover { opacity: .88; }
+
+.ck-pix-waiting {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--text-muted); font-style: italic;
+}
+.ck-pix-spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2.5px solid var(--border); border-top-color: var(--rose);
+  animation: ck-spin .8s linear infinite; flex-shrink: 0;
+}
+@keyframes ck-spin { to { transform: rotate(360deg); } }
+
+.ck-ticket-link {
+  font-size: 12px; color: var(--rose); text-decoration: none;
+  border-bottom: 1px solid var(--rose-pale); padding-bottom: 2px;
+  transition: opacity .2s;
+}
+.ck-ticket-link:hover { opacity: .75; }
+
+.ck-pix-trust {
+  text-align: center; font-size: 11.5px; color: var(--text-muted); margin-top: 16px;
+}
+
+/* confirmado */
+.ck-pix-confirmed {
+  text-align: center; padding: 60px 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+}
+.ck-pix-confirmed-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: #dcfce7; color: #16a34a;
+  font-size: 32px; display: flex; align-items: center; justify-content: center;
+  animation: ck-pop .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes ck-pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.ck-pix-confirmed h2 { font-family: var(--serif); font-size: 28px; font-weight: 300; color: var(--text); }
+.ck-pix-confirmed p  { font-size: 14px; color: var(--text-muted); }
