@@ -48,8 +48,8 @@ export default function AdminClient() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: pwd, days: rangeDays }),
       })
-      if (res.status === 401) { setError('Senha incorreta'); setAuthed(false); setLoading(false); return }
       const json = await res.json()
+      if (!res.ok) { setError(json?.error ?? 'Senha incorreta'); setAuthed(false); setLoading(false); return }
       setStats(json); setAuthed(true)
       try { sessionStorage.setItem('rc_admin_pwd', pwd) } catch {}
     } catch {
