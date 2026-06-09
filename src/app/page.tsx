@@ -47,7 +47,7 @@ function diffParts(from: Date, to: Date){
   return {y,mo,d,h,mi,s}
 }
 function nextValentines(){
-  const now = new Date(); let y = now.getFullYear()
+  const now = new Date(); const y = now.getFullYear()
   let t = new Date(y,5,12)
   if(t < now) t = new Date(y+1,5,12)
   return t
@@ -201,8 +201,6 @@ export default function LandingPage() {
     els.forEach(e=>io.observe(e))
     return()=>io.disconnect()
   },[])
-
-  function scrollToDemo(){ document.getElementById('lp-demo')?.scrollIntoView({behavior:'smooth'}) }
 
   return (
     <div className="lp">
