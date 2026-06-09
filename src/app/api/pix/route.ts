@@ -9,7 +9,8 @@ function generateSlug(nome1: string, nome2: string) {
 }
 
 export async function POST(req: NextRequest) {
-  try     const formData = await req.formData()
+  try {
+    const formData = await req.formData()
     const casalIdForm = (formData.get('casal_id') as string)?.trim()
     const admin = getSupabaseAdmin()
 
