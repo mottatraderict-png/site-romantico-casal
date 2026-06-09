@@ -39,7 +39,7 @@ export default function SucessoClient({ slug, qrDataUrl, casalId, mpUrl }: { slu
   const link = foundSlug ? `${baseUrl}/${foundSlug}` : ''
 
   // Pixel: Purchase ao carregar página de sucesso
-  useEffect(() => { pixelTrack('Purchase', { value: 19.90, currency: 'BRL' }) }, [])
+  useEffect(() => { pixelTrack('Purchase', { value: 29.90, currency: 'BRL' }) }, [])
 
   // Polling automático por casal_id — verifica a cada 3s por até 2 minutos
   useEffect(() => {

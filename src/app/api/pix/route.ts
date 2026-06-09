@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
 
     const payment = await paymentClient.create({
       body: {
-        transaction_amount: 19.90,
+        transaction_amount: 29.90,
         payment_method_id: 'pix',
         date_of_expiration: expirationDate.toISOString(),
         payer: {

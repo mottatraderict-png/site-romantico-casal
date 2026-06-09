@@ -231,11 +231,11 @@ export default function LandingPage() {
             Uma página romântica <em>só para os dois</em>
           </h1>
           <p className="lp-lede">
-            Fotos, contador ao vivo, linha do tempo e uma carta de amor — tudo numa página linda com o link de vocês. Por apenas <span className="price">R$ 19,90</span>.
+            Fotos, contador ao vivo, linha do tempo e uma carta de amor — tudo numa página linda com o link de vocês. Por apenas <span className="price">R$ 29,90</span>.
           </p>
           <div className="lp-cta-card">
             <Link href="/criar" className="lp-btn">
-              <span className="beat h">♥</span> Criar minha página — R$&nbsp;19,90
+              <span className="beat h">♥</span> Criar minha página — R$&nbsp;29,90
             </Link>
             <div className="lp-trust">
               <span><span className="ico">🔒</span> Pagamento seguro via Mercado Pago · PIX ou cartão</span>
@@ -381,7 +381,7 @@ export default function LandingPage() {
           <div className="lp-steps lp-reveal">
             {[
               {n:'1',t:'Preencha o formulário',p:'Conte a história de vocês em 6 passos: nomes, data, fotos, marcos e a música que toca no coração.'},
-              {n:'2',t:'Pague R$ 19,90',      p:'Pagamento seguro via Mercado Pago — PIX ou cartão. Rápido e sem complicação.'},
+              {n:'2',t:'Pague R$ 29,90',      p:'Pagamento seguro via Mercado Pago — PIX ou cartão. Rápido e sem complicação.'},
               {n:'3',t:'Receba o link por e-mail',p:'Sua página romântica chega na hora, pronta pra surpreender quem você ama.'},
             ].map((s,i)=>(
               <div key={i} className="lp-step">
@@ -429,7 +429,7 @@ export default function LandingPage() {
           </div>
           <div className="lp-cta-card">
             <Link href="/criar" className="lp-btn">
-              <span className="beat h">♥</span> Criar minha página — R$&nbsp;19,90
+              <span className="beat h">♥</span> Criar minha página — R$&nbsp;29,90
             </Link>
             <div className="lp-trust">
               <span><span className="ico">✓</span> Você preenche tudo primeiro, paga só no final</span>
@@ -454,7 +454,7 @@ export default function LandingPage() {
       <div className="lp-dock" ref={dockRef}>
         <div className="lp-dock-inner">
           <div className="info">
-            <div className="t">R$ 19,90</div>
+            <div className="t">R$ 29,90</div>
             <div className="s">PIX ou cartão · pague só no final</div>
           </div>
           <Link href="/criar" className="lp-btn" style={{width:'auto',flex:'none',fontSize:16,padding:'13px 18px',borderRadius:13}}>

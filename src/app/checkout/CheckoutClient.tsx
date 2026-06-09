@@ -61,7 +61,7 @@ export default function CheckoutClient({
         if (json.status === 'publicado' && json.slug) {
           clearInterval(pollRef.current!)
           setStage('pix-confirmed')
-          pixelTrack('Purchase', { value: 19.90, currency: 'BRL' })
+          pixelTrack('Purchase', { value: 29.90, currency: 'BRL' })
           try {
             localStorage.removeItem('form_casal_draft')
           } catch {}
@@ -126,7 +126,7 @@ export default function CheckoutClient({
         setQrCode(json.qrCode ?? '')
         setTicketUrl(json.ticketUrl ?? '')
         setCasalId(json.casalId ?? '')
-        pixelTrack('InitiateCheckout', { value: 19.90, currency: 'BRL' })
+        pixelTrack('InitiateCheckout', { value: 29.90, currency: 'BRL' })
         setStage('pix-qr')
         setTimeLeft(3 * 60)
         setSubmitting(false)
@@ -140,7 +140,7 @@ export default function CheckoutClient({
 
         if (!res.ok || !json.checkoutUrl) throw new Error(json.error ?? 'Erro ao gerar pagamento')
 
-        pixelTrack('InitiateCheckout', { value: 19.90, currency: 'BRL' })
+        pixelTrack('InitiateCheckout', { value: 29.90, currency: 'BRL' })
         try {
           localStorage.removeItem('form_casal_draft')
         } catch {}
@@ -214,7 +214,7 @@ export default function CheckoutClient({
                   ) : (
                     <div className="ck-qr-placeholder">⬡</div>
                   )}
-                  <div className="ck-qr-amount">R$ 19,90</div>
+                  <div className="ck-qr-amount">R$ 29,90</div>
                 </div>
 
                 {/* Copia e cola */}
@@ -358,7 +358,7 @@ export default function CheckoutClient({
           <div className="ck-cta-wrap">
             {status && <div className="ck-status">{status}</div>}
             <button className="ck-btn-pay" onClick={handlePay} disabled={submitting}>
-              {submitting ? '⏳ Processando...' : payMethod === 'pix' ? '⬡ Gerar QR Code PIX — R$ 19,90' : '🔒 Pagar com Cartão — R$ 19,90'}
+              {submitting ? '⏳ Processando...' : payMethod === 'pix' ? '⬡ Gerar QR Code PIX — R$ 29,90' : '🔒 Pagar com Cartão — R$ 29,90'}
             </button>
             <p className="ck-trust-text">
               🔒 Pagamento seguro pelo{' '}
@@ -375,7 +375,7 @@ export default function CheckoutClient({
           <div className="ck-plan-card">
             <span className="ck-popular-badge">♥ Presente perfeito</span>
             <div className="ck-plan-name"><span>🌹</span> Página Romântica do Casal</div>
-            <div className="ck-plan-price">R$ 19,90</div>
+            <div className="ck-plan-price">R$ 29,90</div>
             <p className="ck-plan-period">pagamento único · página no ar para sempre</p>
             <div className="ck-plan-features">
               {FEATURES.map((f, i) => (
@@ -397,8 +397,8 @@ export default function CheckoutClient({
             {marcosCount > 0 && <div className="ck-summary-row"><span>📖 Momentos</span><span>{marcosCount} momento{marcosCount > 1 ? 's' : ''}</span></div>}
             {temCarta        && <div className="ck-summary-row"><span>💌 Cartinha</span><span style={{ color: '#22c55e' }}>✓ incluída</span></div>}
             {temMusica       && <div className="ck-summary-row"><span>🎵 Música</span><span style={{ fontStyle:'italic', fontSize:11 }}>{temMusica}</span></div>}
-            <div className="ck-summary-row"><span>Página Romântica</span><span>R$ 19,90</span></div>
-            <div className="ck-summary-row total"><span>Total</span><span>R$ 19,90</span></div>
+            <div className="ck-summary-row"><span>Página Romântica</span><span>R$ 29,90</span></div>
+            <div className="ck-summary-row total"><span>Total</span><span>R$ 29,90</span></div>
           </div>
 
           <div className="ck-security-card">

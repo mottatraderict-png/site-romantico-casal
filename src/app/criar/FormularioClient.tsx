@@ -219,7 +219,7 @@ export default function FormularioClient() {
   }
   function goNext(to: number) {
     // Pixel: InitiateCheckout ao entrar no step 5 (resumo/finalizar)
-    if (to === 5) pixelTrack('InitiateCheckout', { value: 19.90, currency: 'BRL' })
+    if (to === 5) pixelTrack('InitiateCheckout', { value: 29.90, currency: 'BRL' })
     setStep(to)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }

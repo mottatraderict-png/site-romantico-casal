@@ -223,7 +223,7 @@ export async function POST(req: NextRequest) {
             id: 'pagina-romantica',
             title: 'Página Romântica do Casal',
             quantity: 1,
-            unit_price: 19.90,
+            unit_price: 29.90,
             currency_id: 'BRL',
           }],
           payer: { email: email },

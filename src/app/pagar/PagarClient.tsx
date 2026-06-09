@@ -38,7 +38,7 @@ export default function PagarClient({ casalId, nome1, nome2, email }: PagarProps
         if (json.status === 'publicado' && json.slug) {
           clearInterval(pollRef.current!)
           setStage('pix-confirmed')
-          pixelTrack('Purchase', { value: 19.90, currency: 'BRL' })
+          pixelTrack('Purchase', { value: 29.90, currency: 'BRL' })
           setTimeout(() => {
             window.location.href = `/sucesso?casal_id=${casalId}`
           }, 2000)
@@ -89,7 +89,7 @@ export default function PagarClient({ casalId, nome1, nome2, email }: PagarProps
         setQrBase64(json.qrCodeBase64 ?? '')
         setQrCode(json.qrCode ?? '')
         setTicketUrl(json.ticketUrl ?? '')
-        pixelTrack('InitiateCheckout', { value: 19.90, currency: 'BRL' })
+        pixelTrack('InitiateCheckout', { value: 29.90, currency: 'BRL' })
         setStage('pix-qr')
         setTimeLeft(3 * 60)
         setSubmitting(false)
@@ -101,7 +101,7 @@ export default function PagarClient({ casalId, nome1, nome2, email }: PagarProps
 
         if (!res.ok || !json.checkoutUrl) throw new Error(json.error ?? 'Erro ao gerar pagamento')
 
-        pixelTrack('InitiateCheckout', { value: 19.90, currency: 'BRL' })
+        pixelTrack('InitiateCheckout', { value: 29.90, currency: 'BRL' })
         window.location.href = `/sucesso?casal_id=${casalId}&mp=${encodeURIComponent(json.checkoutUrl)}`
       }
     } catch (err) {
@@ -155,7 +155,7 @@ export default function PagarClient({ casalId, nome1, nome2, email }: PagarProps
                   ) : (
                     <div className="ck-qr-placeholder">⬡</div>
                   )}
-                  <div className="ck-qr-amount">R$ 19,90</div>
+                  <div className="ck-qr-amount">R$ 29,90</div>
                 </div>
                 {qrCode && (
                   <div className="ck-copy-wrap">
@@ -230,7 +230,7 @@ export default function PagarClient({ casalId, nome1, nome2, email }: PagarProps
             {errorMsg && <div className="ck-error" style={{ marginBottom: 16 }}>⚠ {errorMsg}</div>}
             {status && <div className="ck-status">{status}</div>}
             <button className="ck-btn-pay" onClick={handlePay} disabled={submitting}>
-              {submitting ? '⏳ Processando...' : payMethod === 'pix' ? '⬡ Gerar QR Code PIX — R$ 19,90' : '🔒 Pagar com Cartão — R$ 19,90'}
+              {submitting ? '⏳ Processando...' : payMethod === 'pix' ? '⬡ Gerar QR Code PIX — R$ 29,90' : '🔒 Pagar com Cartão — R$ 29,90'}
             </button>
             <p className="ck-trust-text">🔒 Pagamento seguro pelo Mercado Pago</p>
           </div>
@@ -243,8 +243,8 @@ export default function PagarClient({ casalId, nome1, nome2, email }: PagarProps
                 <span>💑 {nome1} &amp; {nome2}</span>
               </div>
             )}
-            <div className="ck-summary-row"><span>Página Romântica</span><span>R$ 19,90</span></div>
-            <div className="ck-summary-row total"><span>Total</span><span>R$ 19,90</span></div>
+            <div className="ck-summary-row"><span>Página Romântica</span><span>R$ 29,90</span></div>
+            <div className="ck-summary-row total"><span>Total</span><span>R$ 29,90</span></div>
           </div>
           <div className="ck-security-card">
             <span className="ck-security-icon">🛡️</span>
