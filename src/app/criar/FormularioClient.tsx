@@ -150,10 +150,6 @@ export default function FormularioClient() {
     if (!d) return ''
     return new Date(d + 'T12:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })
   }
-  function daysTogether(d: string) {
-    if (!d) return 0
-    return Math.floor((Date.now() - new Date(d + 'T00:00:00').getTime()) / 86400000)
-  }
   function goNext(to: number) {
     // Pixel: InitiateCheckout ao entrar no step 5 (resumo/finalizar)
     if (to === 5) pixelTrack('InitiateCheckout', { value: 19.90, currency: 'BRL' })

@@ -58,7 +58,6 @@ export default function LandingPage() {
   const floatRef   = useRef<HTMLDivElement>(null)
   const heroRef    = useRef<HTMLElement>(null)
   const dockRef    = useRef<HTMLDivElement>(null)
-  const envRef     = useRef<HTMLDivElement>(null)
 
   const [envOpen, setEnvOpen] = useState(false)
   const [couple, setCouple]   = useState({y:4,mo:4,d:26,h:'08'})
@@ -79,7 +78,8 @@ export default function LandingPage() {
   useEffect(()=>{
     const canvas = canvasRef.current; if(!canvas) return
     const ctx = canvas.getContext('2d')!
-    let W=0,H=0,dpr=1,parts:any[]=[], raf=0
+    interface Part { x:number;y:number;s:number;vy:number;vx:number;rot:number;vr:number;sway:number;swaySpd:number;amp:number;alpha:number;color:string;heart:boolean }
+    let W=0,H=0,dpr=1; const parts:Part[]=[]; let raf=0
     const resize=()=>{
       dpr = Math.min(window.devicePixelRatio||1,2)
       W = window.innerWidth; H = window.innerHeight
@@ -91,7 +91,7 @@ export default function LandingPage() {
       ctx.moveTo(0,3);ctx.bezierCurveTo(-5,-3,-9,2,0,9);ctx.bezierCurveTo(9,2,5,-3,0,3)
       ctx.closePath();ctx.restore()
     }
-    function make(top:boolean){
+    function make(top:boolean):Part{
       const isH=Math.random()<0.6
       return{x:Math.random()*W,y:top?-20-Math.random()*H*0.4:Math.random()*H,
         s:isH?0.7+Math.random()*1.4:0.5+Math.random()*0.9,
@@ -320,7 +320,6 @@ export default function LandingPage() {
 
               {/* envelope */}
               <div
-                ref={envRef}
                 className={`lp-env-cover${envOpen?' open':''}`}
                 onClick={()=>setEnvOpen(true)}
               >
