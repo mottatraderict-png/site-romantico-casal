@@ -125,11 +125,15 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Criar Payment PIX via MP ──────────────────────────────
-    let baseUrl = process.env.NEXT_PUBLIC_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://cartadeamor.site')
-    if (!baseUrl.startsWith('http')) {
-      baseUrl = `https://${baseUrl}`
+    let rawBaseUrl = (process.env.NEXT_PUBLIC_URL || '').trim()
+    if (!rawBaseUrl) {
+      const vercelUrl = (process.env.VERCEL_URL || '').trim()
+      rawBaseUrl = vercelUrl ? `https://${vercelUrl}` : 'https://cartadeamor.site'
     }
-    baseUrl = baseUrl.replace(/\/$/, '')
+    if (!rawBaseUrl.startsWith('http')) {
+      rawBaseUrl = `https://${rawBaseUrl}`
+    }
+    let baseUrl = rawBaseUrl.replace(/\/$/, '')
 
     // Mercado Pago exige HTTPS e domínio público válido (rejeita localhost)
     if (baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1')) {
@@ -137,6 +141,7 @@ export async function POST(req: NextRequest) {
     }
 
     const notificationUrl = `${baseUrl}/api/webhook/mercadopago`
+    console.log('[pix] notificationUrl:', notificationUrl)
 
     const mp = new MercadoPagoConfig({ accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN! })
     const paymentClient = new Payment(mp)
