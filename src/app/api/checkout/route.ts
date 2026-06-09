@@ -192,7 +192,18 @@ export async function POST(req: NextRequest) {
     }
 
     // Criar preferência MP com external_reference = casal.id para o webhook achar o casal
-    const baseUrl = process.env.NEXT_PUBLIC_URL ?? 'https://site-romantico-casal.vercel.app'
+    let baseUrl = process.env.NEXT_PUBLIC_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://cartadeamor.site')
+    if (!baseUrl.startsWith('http')) {
+      baseUrl = `https://${baseUrl}`
+    }
+    baseUrl = baseUrl.replace(/\/$/, '')
+
+    // Mercado Pago exige HTTPS e domínio público válido (rejeita localhost)
+    if (baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1')) {
+      baseUrl = 'https://cartadeamor.site'
+    }
+
+    const notificationUrl = `${baseUrl}/api/webhook/mercadopago`
     let checkoutUrl = 'https://mpago.la/1oVhCHY' // fallback link fixo
 
     try {
@@ -215,7 +226,7 @@ export async function POST(req: NextRequest) {
             pending: `${baseUrl}/sucesso?casal_id=${casal.id}`,
           },
           auto_return: 'approved',
-          notification_url: `${baseUrl}/api/webhook/mercadopago`,
+          notification_url: notificationUrl,
         }
       })
       if (pref.init_point) {

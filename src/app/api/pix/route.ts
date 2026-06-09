@@ -125,7 +125,18 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Criar Payment PIX via MP ──────────────────────────────
-    const baseUrl = process.env.NEXT_PUBLIC_URL ?? 'https://site-romantico-casal.vercel.app'
+    let baseUrl = process.env.NEXT_PUBLIC_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://cartadeamor.site')
+    if (!baseUrl.startsWith('http')) {
+      baseUrl = `https://${baseUrl}`
+    }
+    baseUrl = baseUrl.replace(/\/$/, '')
+
+    // Mercado Pago exige HTTPS e domínio público válido (rejeita localhost)
+    if (baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1')) {
+      baseUrl = 'https://cartadeamor.site'
+    }
+
+    const notificationUrl = `${baseUrl}/api/webhook/mercadopago`
 
     const mp = new MercadoPagoConfig({ accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN! })
     const paymentClient = new Payment(mp)
@@ -137,7 +148,7 @@ export async function POST(req: NextRequest) {
         payer: { email },
         external_reference: casal.id,
         description: `Página Romântica — ${nome1} & ${nome2}`,
-        notification_url: `${baseUrl}/api/webhook/mercadopago`,
+        notification_url: notificationUrl,
       }
     })
 
