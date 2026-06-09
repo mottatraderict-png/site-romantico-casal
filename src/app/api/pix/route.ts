@@ -69,6 +69,8 @@ export async function POST(req: NextRequest) {
       .from('casais')
       .insert({
         email_cliente: email,
+        whatsapp: whatsapp.trim() || null,
+        nome_casal: `${nome1.trim()} & ${nome2.trim()}`,
         nome1: nome1.trim(), nome2: nome2.trim(),
         apelido1: apelido1.trim() || null, apelido2: apelido2.trim() || null,
         data_inicio: dataInicio || null,

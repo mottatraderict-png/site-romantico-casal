@@ -124,9 +124,24 @@ export default function CheckoutClient({
   }
 
   async function copyCode() {
-    await navigator.clipboard.writeText(qrCode)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(qrCode)
+      } else {
+        const textarea = document.createElement('textarea')
+        textarea.value = qrCode
+        textarea.style.position = 'fixed'
+        textarea.style.opacity = '0'
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+      }
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Erro ao copiar código:', err)
+    }
   }
 
   // ── TELA PIX QR ─────────────────────────────────────────────
