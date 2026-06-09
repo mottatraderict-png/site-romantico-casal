@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 
-const TIPOS_VALIDOS = ['page_view', 'form_open', 'checkout_reached']
+const TIPOS_VALIDOS = ['page_view', 'form_open', 'checkout_reached', 'page_time']
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,12 +11,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'tipo inválido' }, { status: 400 })
     }
 
+    const durRaw = Number(body?.durationMs)
+    const duration_ms = Number.isFinite(durRaw) && durRaw > 0 ? Math.round(durRaw) : null
+
     const admin = getSupabaseAdmin()
     const { error } = await admin.from('eventos').insert({
       tipo,
-      path:       body?.path ? String(body.path).slice(0, 200) : null,
-      referrer:   body?.referrer ? String(body.referrer).slice(0, 300) : null,
-      session_id: body?.sessionId ? String(body.sessionId).slice(0, 60) : null,
+      path:        body?.path ? String(body.path).slice(0, 200) : null,
+      referrer:    body?.referrer ? String(body.referrer).slice(0, 300) : null,
+      session_id:  body?.sessionId ? String(body.sessionId).slice(0, 60) : null,
+      duration_ms,
     })
 
     if (error) {

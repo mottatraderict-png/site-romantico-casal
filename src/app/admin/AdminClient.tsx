@@ -17,6 +17,7 @@ interface Stats {
     checkoutParaPago: number; acessoParaPago: number
   }
   referrers: { fonte: string; total: number }[]
+  tempoMedioMs: number
   ultimosPedidos: { nome1: string; nome2: string; status: string; email_cliente: string; created_at: string; slug: string }[]
   eventosOk?: boolean
   eventosErro?: string
@@ -68,6 +69,13 @@ export default function AdminClient() {
 
   const money = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
   const pct = (v: number) => `${v.toFixed(1)}%`
+  const tempo = (ms: number) => {
+    if (!ms) return '—'
+    const s = Math.round(ms / 1000)
+    if (s < 60) return `${s}s`
+    const m = Math.floor(s / 60)
+    return `${m}min ${s % 60}s`
+  }
 
   // ── DASHBOARD ─────────────────────────────────────────────
   const f = stats?.funil
@@ -79,6 +87,8 @@ export default function AdminClient() {
     { label: 'Chegaram no checkout', value: f.checkouts,   sub: `${f.checkoutHoje} hoje`,    icon: '🛒', color: C.amber },
     { label: 'Pedidos pagos',     value: f.pagos,       sub: `${f.pagosHoje} hoje`,          icon: '✅', color: C.green },
   ] : []
+
+  const tempoMedioFmt = stats ? tempo(stats.tempoMedioMs) : '—'
 
   const funnelSteps = f && t ? [
     { label: 'Acessos',    value: f.acessos,     rate: null },
@@ -130,11 +140,19 @@ export default function AdminClient() {
 
         {stats && !loading && (
           <>
-            {/* Receita */}
-            <div style={{ background: `linear-gradient(135deg, ${C.rose}, #8c1a2e)`, borderRadius: 16, padding: '24px 28px', marginBottom: 24 }}>
-              <p style={{ fontSize: 13, opacity: 0.85, marginBottom: 4 }}>Receita no período ({days} dias)</p>
-              <p style={{ fontSize: 38, fontWeight: 700 }}>{money(stats.receita)}</p>
-              <p style={{ fontSize: 13, opacity: 0.85, marginTop: 4 }}>{stats.pedidos.pagos} pedidos pagos · {stats.pedidos.pendentes} pendentes</p>
+            {/* Receita + tempo médio */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) minmax(0,1fr)', gap: 16, marginBottom: 24 }}>
+              <div style={{ background: `linear-gradient(135deg, ${C.rose}, #8c1a2e)`, borderRadius: 16, padding: '24px 28px' }}>
+                <p style={{ fontSize: 13, opacity: 0.85, marginBottom: 4 }}>Receita no período ({days} dias)</p>
+                <p style={{ fontSize: 38, fontWeight: 700 }}>{money(stats.receita)}</p>
+                <p style={{ fontSize: 13, opacity: 0.85, marginTop: 4 }}>{stats.pedidos.pagos} pedidos pagos · {stats.pedidos.pendentes} pendentes</p>
+              </div>
+              <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: '24px 28px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <p style={{ fontSize: 22, marginBottom: 8 }}>⏱️</p>
+                <p style={{ fontSize: 30, fontWeight: 700, color: C.roseLight, lineHeight: 1 }}>{tempoMedioFmt}</p>
+                <p style={{ fontSize: 13, color: C.text, marginTop: 8, fontWeight: 500 }}>Tempo médio na página</p>
+                <p style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>por visita no período</p>
+              </div>
             </div>
 
             {/* Cards do funil */}

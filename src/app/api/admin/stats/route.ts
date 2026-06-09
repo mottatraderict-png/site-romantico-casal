@@ -40,6 +40,21 @@ export async function POST(req: NextRequest) {
     return new Set((data ?? []).map((r: { session_id: string | null }) => r.session_id).filter(Boolean)).size
   }
 
+  // ── Tempo médio na página ──────────────────────────────────
+  async function tempoMedioMs(sinceIso: string) {
+    const { data, error } = await admin.from('eventos')
+      .select('duration_ms')
+      .eq('tipo', 'page_time')
+      .gte('created_at', sinceIso)
+      .not('duration_ms', 'is', null)
+    if (error || !data || data.length === 0) return 0
+    const vals = (data as { duration_ms: number | null }[])
+      .map(r => r.duration_ms ?? 0)
+      .filter(v => v > 0)
+    if (!vals.length) return 0
+    return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length)
+  }
+
   // ── Referrers (de onde vieram) ─────────────────────────────
   async function topReferrers(sinceIso: string) {
     const { data } = await admin.from('eventos')
@@ -77,7 +92,7 @@ export async function POST(req: NextRequest) {
     formAbertos, formHoje,
     checkouts, checkoutHoje,
     totalPedidos, pendentes, pagos, pagosHoje,
-    referrers, ultimosPedidos,
+    referrers, tempoMedio, ultimosPedidos,
   ] = await Promise.all([
     countEvento('page_view', desde),
     countEventoUnico('page_view', desde),
@@ -91,6 +106,7 @@ export async function POST(req: NextRequest) {
     countCasais('publicado', desde),
     countCasais('publicado', hoje),
     topReferrers(desde),
+    tempoMedioMs(desde),
     admin.from('casais')
       .select('*')
       .order(dateCol, { ascending: false })
@@ -116,6 +132,7 @@ export async function POST(req: NextRequest) {
       acessoParaPago:   acessos     ? (pagos / acessos * 100) : 0,
     },
     referrers,
+    tempoMedioMs: tempoMedio,
     ultimosPedidos,
     eventosOk, eventosErro, pedidosErro,
   })
