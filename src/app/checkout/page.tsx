@@ -1,24 +1,7 @@
-import { Metadata } from 'next'
-import CheckoutClient from './CheckoutClient'
+import { redirect } from 'next/navigation'
 
-export const metadata: Metadata = {
-  title: 'Checkout · Página Romântica do Casal',
-}
-
-// Esta página é acessada diretamente via client-side navigation a partir do formulário.
-// O CheckoutClient recebe os dados via props do FormularioClient.
+// O checkout só funciona embutido no fluxo do formulário (precisa dos dados
+// coletados em /criar). Acessar /checkout diretamente redireciona para o início.
 export default function CheckoutPage() {
-  return (
-    <CheckoutClient
-      nome1=""
-      nome2=""
-      dataInicio=""
-      fotosCount={0}
-      marcosCount={0}
-      temCarta={false}
-      temMusica=""
-      formData={null}
-      onBack={() => { if (typeof window !== 'undefined') window.history.back() }}
-    />
-  )
+  redirect('/criar')
 }
