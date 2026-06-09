@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { getBaseUrl } from '@/lib/baseUrl'
 import { MercadoPagoConfig, Payment } from 'mercadopago'
 
 function generateSlug(nome1: string, nome2: string) {
@@ -155,20 +156,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Criar Payment PIX via MP ──────────────────────────────
-    let rawBaseUrl = (process.env.NEXT_PUBLIC_URL || '').trim()
-    if (!rawBaseUrl) {
-      rawBaseUrl = 'https://www.cartadeamor.site'
-    }
-    if (!rawBaseUrl.startsWith('http')) {
-      rawBaseUrl = `https://${rawBaseUrl}`
-    }
-    let baseUrl = rawBaseUrl.replace(/\/$/, '')
-
-    // Mercado Pago exige HTTPS e domínio público válido (rejeita localhost)
-    if (baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1')) {
-      baseUrl = 'https://cartadeamor.site'
-    }
-
+    const baseUrl = getBaseUrl()
     const notificationUrl = `${baseUrl}/api/webhook/mercadopago`
     console.log('[pix] notificationUrl:', notificationUrl)
 
