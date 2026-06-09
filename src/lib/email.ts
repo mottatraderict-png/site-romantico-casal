@@ -8,8 +8,7 @@ const FROM = () => (process.env.RESEND_FROM || 'contato@cartadeamor.site').trim(
 const BASE_URL = () => {
   let rawUrl = (process.env.NEXT_PUBLIC_URL || '').trim()
   if (!rawUrl) {
-    const vercelUrl = (process.env.VERCEL_URL || '').trim()
-    rawUrl = vercelUrl ? `https://${vercelUrl}` : 'https://cartadeamor.site'
+    rawUrl = 'https://www.cartadeamor.site'
   }
   if (!rawUrl.startsWith('http')) {
     rawUrl = `https://${rawUrl}`

@@ -213,8 +213,7 @@ export async function POST(req: NextRequest) {
     // Criar preferência MP com external_reference = casal.id para o webhook achar o casal
     let rawBaseUrl = (process.env.NEXT_PUBLIC_URL || '').trim()
     if (!rawBaseUrl) {
-      const vercelUrl = (process.env.VERCEL_URL || '').trim()
-      rawBaseUrl = vercelUrl ? `https://${vercelUrl}` : 'https://cartadeamor.site'
+      rawBaseUrl = 'https://www.cartadeamor.site'
     }
     if (!rawBaseUrl.startsWith('http')) {
       rawBaseUrl = `https://${rawBaseUrl}`

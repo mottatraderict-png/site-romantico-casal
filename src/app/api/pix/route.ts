@@ -150,8 +150,7 @@ export async function POST(req: NextRequest) {
     // ── Criar Payment PIX via MP ──────────────────────────────
     let rawBaseUrl = (process.env.NEXT_PUBLIC_URL || '').trim()
     if (!rawBaseUrl) {
-      const vercelUrl = (process.env.VERCEL_URL || '').trim()
-      rawBaseUrl = vercelUrl ? `https://${vercelUrl}` : 'https://cartadeamor.site'
+      rawBaseUrl = 'https://www.cartadeamor.site'
     }
     if (!rawBaseUrl.startsWith('http')) {
       rawBaseUrl = `https://${rawBaseUrl}`
