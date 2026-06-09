@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { track } from '@/lib/track'
 import '@/styles/landing.css'
 
 // ── Google Fonts ──────────────────────────────────────────────
@@ -63,6 +64,9 @@ export default function LandingPage() {
   const [couple, setCouple]   = useState({y:4,mo:4,d:26,h:'08'})
   const [urgency, setUrgency] = useState({d:3,h:'08',mi:'42',s:'10'})
   const [bulbs,   setBulbs]   = useState<{color:string;delay:string;mt:number}[]>([])
+
+  // tracking de acesso (funil admin)
+  useEffect(()=>{ track('page_view') },[])
 
   // luzinhas
   useEffect(()=>{

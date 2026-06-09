@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { pixelTrack } from '@/lib/pixel'
+import { track } from '@/lib/track'
 import CheckoutClient from '@/app/checkout/CheckoutClient'
 import '@/styles/formulario.css'
 
@@ -31,8 +32,11 @@ const BULBS = Array.from({ length: 20 })
 export default function FormularioClient() {
   const [step, setStep] = useState(0)
 
-  // Pixel: ViewContent ao abrir /criar
-  useEffect(() => { pixelTrack('ViewContent', { content_name: 'formulario' }) }, [])
+  // Pixel: ViewContent ao abrir /criar + tracking de funil admin
+  useEffect(() => {
+    pixelTrack('ViewContent', { content_name: 'formulario' })
+    track('form_open')
+  }, [])
 
   // Step 1
   const [nome1,     setNome1]     = useState('')

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { pixelTrack } from '@/lib/pixel'
+import { track } from '@/lib/track'
 import '@/styles/checkout.css'
 
 interface CheckoutProps {
@@ -45,6 +46,9 @@ export default function CheckoutClient({
   const [casalId,   setCasalId]   = useState('')
   const [timeLeft,  setTimeLeft]  = useState<number | null>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // tracking de funil — usuário chegou no checkout
+  useEffect(() => { track('checkout_reached') }, [])
 
   function formatDate(d: string) {
     if (!d) return ''
