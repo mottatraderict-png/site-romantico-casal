@@ -31,7 +31,9 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git -C /Users/syntax/romantico status)",
-      "Bash(git -C /Users/syntax/romantico log --oneline origin/main..HEAD)"
+      "Bash(git -C /Users/syntax/romantico log --oneline origin/main..HEAD)",
+      "Bash(gunzip -c /Users/syntax/.claude/projects/-Users-syntax-romantico/6a0e3a62-dc1a-4912-9b44-d5cab9eb68aa/tool-results/webfetch-1781023301210-4oq3ie.bin)",
+      "Read(//tmp/**)"
     ]
   }
 }
