@@ -15,6 +15,25 @@ export default function SucessoClient({ slug, qrDataUrl, casalId, mpUrl }: { slu
   const [foundNomes, setFoundNomes] = useState('')
   const [buscaErro, setBuscaErro] = useState('')
   const [buscaStatus, setBuscaStatus] = useState('')
+  const [resending, setResending] = useState(false)
+  const [resendStatus, setResendStatus] = useState('')
+
+  async function resendEmail() {
+    if (!casalId && !email && !foundSlug) return
+    setResending(true)
+    setResendStatus('Enviando...')
+    try {
+      const query = casalId ? `casal_id=${casalId}` : email ? `email=${encodeURIComponent(email)}` : `slug=${foundSlug}`
+      const res = await fetch(`/api/buscar-pagina?${query}&sendEmail=1`)
+      if (res.ok) setResendStatus('E-mail reenviado com sucesso!')
+      else setResendStatus('Erro ao reenviar.')
+    } catch {
+      setResendStatus('Erro ao reenviar.')
+    } finally {
+      setResending(false)
+      setTimeout(() => setResendStatus(''), 4000)
+    }
+  }
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
   const link = foundSlug ? `${baseUrl}/${foundSlug}` : ''
@@ -182,17 +201,25 @@ export default function SucessoClient({ slug, qrDataUrl, casalId, mpUrl }: { slu
     }
   }
 
-  const btnStyle: React.CSSProperties = {
-    background: 'var(--rose)', border: 'none', borderRadius: 4,
-    padding: '13px 24px', color: 'white',
-    fontFamily: 'var(--title)', fontSize: 10, letterSpacing: '0.2em',
-    textTransform: 'uppercase', cursor: 'pointer',
+  const btnSolid: React.CSSProperties = {
+    background: '#be2e4b', border: 'none', borderRadius: 4,
+    padding: '16px 28px', color: 'white',
+    fontFamily: 'var(--title)', fontSize: 11, letterSpacing: '0.15em',
+    textTransform: 'uppercase', cursor: 'pointer', flex: 1,
+    minWidth: 160
   }
   const btnOutline: React.CSSProperties = {
-    background: 'none', border: '1px solid var(--border)', borderRadius: 4,
-    padding: '13px 24px', color: 'var(--text-soft)',
-    fontFamily: 'var(--title)', fontSize: 10, letterSpacing: '0.2em',
-    textTransform: 'uppercase', cursor: 'pointer', textDecoration: 'none', display: 'inline-block',
+    background: '#fffbf9', border: '1px solid #eadad2', borderRadius: 4,
+    padding: '16px 28px', color: '#8e7970',
+    fontFamily: 'var(--title)', fontSize: 11, letterSpacing: '0.15em',
+    textTransform: 'uppercase', cursor: 'pointer', textDecoration: 'none', 
+    flex: 1, minWidth: 160, display: 'flex', alignItems: 'center', justifyContent: 'center'
+  }
+  const btnReenviar: React.CSSProperties = {
+    background: 'none', border: 'none', color: '#c59d87',
+    fontFamily: 'var(--title)', fontSize: 10, letterSpacing: '0.1em',
+    textTransform: 'uppercase', cursor: 'pointer', marginTop: 16,
+    textDecoration: 'underline'
   }
 
   return (
@@ -215,38 +242,48 @@ export default function SucessoClient({ slug, qrDataUrl, casalId, mpUrl }: { slu
         {foundSlug ? (
           <>
             {foundNomes && (
-              <p style={{ fontFamily: 'var(--serif)', fontSize: 18, fontStyle: 'italic', color: 'var(--rose-light)', marginBottom: 8 }}>
+              <p style={{ fontFamily: 'var(--serif)', fontSize: 20, fontStyle: 'italic', color: '#f76b8a', marginBottom: 24, fontWeight: 500 }}>
                 {foundNomes}
               </p>
             )}
-            <p style={{ fontSize: 14, color: 'var(--text-soft)', fontStyle: 'italic', lineHeight: 1.7, marginBottom: 16 }}>
+            <p style={{ fontSize: 16, color: '#6d5a52', fontStyle: 'italic', lineHeight: 1.6, marginBottom: 24 }}>
               A história de vocês ganhou um lugar especial na internet.<br />
               Compartilhe o link abaixo como surpresa. ♡
             </p>
-            <p style={{ fontSize: 12, color: 'var(--gold-light)', fontStyle: 'italic', marginBottom: 24, opacity: 0.8 }}>
+            <p style={{ fontSize: 14, color: '#c59d87', fontStyle: 'italic', marginBottom: 24 }}>
               ✉️ Enviamos o link para o seu e-mail também.
             </p>
 
             <div
               onClick={copyLink}
-              style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 4, padding: '14px 20px', fontFamily: 'var(--title)', fontSize: 13, letterSpacing: '0.1em', color: 'var(--rose-light)', wordBreak: 'break-all', cursor: 'pointer', marginBottom: 24 }}
+              style={{ background: '#ffffff', border: '1px solid #eadad2', borderRadius: 4, padding: '16px 20px', fontFamily: 'var(--title)', fontSize: 14, letterSpacing: '0.05em', color: '#f76b8a', wordBreak: 'break-all', cursor: 'pointer', marginBottom: 32, boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}
             >
               {link}
             </div>
 
             {foundQr && (
-              <div style={{ marginBottom: 32 }}>
-                <p style={{ fontFamily: 'var(--title)', fontSize: 9, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--gold-light)', marginBottom: 16 }}>
+              <div style={{ marginBottom: 40 }}>
+                <p style={{ fontFamily: 'var(--title)', fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#c59d87', marginBottom: 16 }}>
                   QR Code para imprimir ou enviar
                 </p>
-                <img src={foundQr} alt="QR Code" width={180} height={180} style={{ border: '8px solid #f5ede6', borderRadius: 4, display: 'block', margin: '0 auto 16px' }} />
+                <div style={{ display: 'inline-block', padding: 12, background: '#f5ede6', borderRadius: 8, margin: '0 auto' }}>
+                  <img src={foundQr} alt="QR Code" width={180} height={180} style={{ display: 'block', borderRadius: 4, mixBlendMode: 'multiply' }} />
+                </div>
               </div>
             )}
 
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button onClick={copyLink} style={btnStyle}>{copied ? '✓ Copiado!' : 'Copiar link'}</button>
+            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
+              <button onClick={copyLink} style={btnSolid}>{copied ? '✓ Copiado!' : 'Copiar link'}</button>
               {foundQr && <button onClick={downloadQR} style={btnOutline}>Baixar QR code</button>}
-              <a href={`/${foundSlug}`} target="_blank" rel="noopener noreferrer" style={btnOutline}>Ver minha página →</a>
+            </div>
+            
+            <a href={`/${foundSlug}`} target="_blank" rel="noopener noreferrer" style={{ ...btnOutline, display: 'flex', width: '100%', maxWidth: 360, margin: '0 auto' }}>Ver minha página →</a>
+            
+            <div style={{ marginTop: 24 }}>
+              <button onClick={resendEmail} disabled={resending} style={btnReenviar}>
+                {resending ? 'Enviando...' : 'Reenviar E-mail'}
+              </button>
+              {resendStatus && <p style={{ fontSize: 12, color: '#c59d87', marginTop: 8 }}>{resendStatus}</p>}
             </div>
           </>
         ) : casalId ? (
