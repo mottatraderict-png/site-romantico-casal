@@ -13,11 +13,16 @@ export async function POST(req: NextRequest) {
   const range = Number(body?.days) || 30 // janela em dias
   const desde = isoDaysAgo(range)
 
+  // Detecta se a tabela eventos existe (senão o funil não funciona)
+  let eventosOk = true
+  let eventosErro = ''
+
   // ── Contadores de eventos do funil ─────────────────────────
   async function countEvento(tipo: string, sinceIso?: string) {
     let q = admin.from('eventos').select('id', { count: 'exact', head: true }).eq('tipo', tipo)
     if (sinceIso) q = q.gte('created_at', sinceIso)
-    const { count } = await q
+    const { count, error } = await q
+    if (error) { eventosOk = false; eventosErro = error.message }
     return count ?? 0
   }
 
@@ -83,5 +88,7 @@ export async function POST(req: NextRequest) {
       acessoParaPago:     acessos    ? (pagos / acessos * 100) : 0,
     },
     ultimosPedidos,
+    eventosOk,
+    eventosErro,
   })
 }

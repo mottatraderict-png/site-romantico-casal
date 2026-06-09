@@ -17,6 +17,8 @@ interface Stats {
     checkoutParaPago: number; acessoParaPago: number
   }
   ultimosPedidos: { nome1: string; nome2: string; status: string; email_cliente: string; created_at: string; slug: string }[]
+  eventosOk?: boolean
+  eventosErro?: string
 }
 
 const RANGES = [
@@ -105,6 +107,17 @@ export default function AdminClient() {
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: 24 }}>
         {loading && <p style={{ color: C.muted, textAlign: 'center', padding: 40 }}>Carregando...</p>}
         {error && <p style={{ color: C.rose, textAlign: 'center', padding: 40 }}>⚠ {error}</p>}
+
+        {stats && !loading && stats.eventosOk === false && (
+          <div style={{ background: 'rgba(242,169,59,0.12)', border: `1px solid ${C.amber}`, borderRadius: 12, padding: '16px 20px', marginBottom: 20 }}>
+            <p style={{ color: C.amber, fontSize: 14, fontWeight: 600, marginBottom: 6 }}>⚠ Tracking de funil inativo</p>
+            <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.6 }}>
+              A tabela <code style={{ color: C.text }}>eventos</code> não foi encontrada no Supabase, então
+              acessos / formulário / checkout aparecem zerados. Rode o SQL de <code style={{ color: C.text }}>supabase/eventos.sql</code> no
+              SQL Editor do Supabase para ativar. (Pedidos pagos continuam funcionando normalmente.)
+            </p>
+          </div>
+        )}
 
         {stats && !loading && (
           <>

@@ -12,16 +12,21 @@ export async function POST(req: NextRequest) {
     }
 
     const admin = getSupabaseAdmin()
-    await admin.from('eventos').insert({
+    const { error } = await admin.from('eventos').insert({
       tipo,
       path:       body?.path ? String(body.path).slice(0, 200) : null,
       referrer:   body?.referrer ? String(body.referrer).slice(0, 300) : null,
       session_id: body?.sessionId ? String(body.sessionId).slice(0, 60) : null,
     })
 
+    if (error) {
+      // Loga (visível nos logs da Vercel) mas não quebra a experiência do usuário
+      console.error('[track] erro ao inserir evento — a tabela "eventos" existe? ', error.message)
+    }
+
     return NextResponse.json({ ok: true })
-  } catch {
-    // Nunca quebra a experiência do usuário por causa de tracking
+  } catch (err) {
+    console.error('[track] exception:', err)
     return NextResponse.json({ ok: true })
   }
 }
