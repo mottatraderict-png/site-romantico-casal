@@ -42,6 +42,7 @@ export default function CheckoutClient({
   const [qrCode,    setQrCode]    = useState('')   // copia-e-cola
   const [ticketUrl, setTicketUrl] = useState('')
   const [casalId,   setCasalId]   = useState('')
+  const [timeLeft,  setTimeLeft]  = useState<number | null>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   function formatDate(d: string) {
@@ -71,6 +72,21 @@ export default function CheckoutClient({
     }, 3000)
     return () => { if (pollRef.current) clearInterval(pollRef.current) }
   }, [stage, casalId])
+
+  // ── Timer regressivo para o PIX ─────────────────────────────
+  useEffect(() => {
+    if (stage !== 'pix-qr' || timeLeft === null) return
+    if (timeLeft <= 0) {
+      setQrBase64('')
+      setQrCode('')
+      setStatus('O tempo para pagamento expirou. Gere um novo PIX.')
+      setStage('form')
+      setTimeLeft(null)
+      return
+    }
+    const timer = setInterval(() => setTimeLeft(prev => prev! - 1), 1000)
+    return () => clearInterval(timer)
+  }, [stage, timeLeft])
 
   async function handlePay() {
     setEmailError('')
@@ -105,6 +121,7 @@ export default function CheckoutClient({
         setCasalId(json.casalId ?? '')
         pixelTrack('InitiateCheckout', { value: 19.90, currency: 'BRL' })
         setStage('pix-qr')
+        setTimeLeft(3 * 60)
         setSubmitting(false)
         setStatus('')
 
@@ -214,7 +231,14 @@ export default function CheckoutClient({
                 {/* Aguardando */}
                 <div className="ck-pix-waiting">
                   <div className="ck-pix-spinner" />
-                  <span>Aguardando pagamento...</span>
+                  <span>
+                    Aguardando pagamento...
+                    {timeLeft !== null && (
+                      <b style={{ color: 'var(--rose)', marginLeft: 8 }}>
+                        (Expira em {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')})
+                      </b>
+                    )}
+                  </span>
                 </div>
 
                 {ticketUrl && (

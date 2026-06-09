@@ -146,17 +146,20 @@ export async function POST(req: NextRequest) {
     const mp = new MercadoPagoConfig({ accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN! })
     const paymentClient = new Payment(mp)
 
+    const expirationDate = new Date(Date.now() + 3 * 60 * 1000)
+
     const payment = await paymentClient.create({
       body: {
         transaction_amount: 19.90,
         payment_method_id: 'pix',
+        date_of_expiration: expirationDate.toISOString(),
         payer: {
           email,
           first_name: nome1 || 'Cliente',
           last_name: nome2 || 'Casal',
           identification: {
             type: 'CPF',
-            number: '19119119100' // Generic CPF to pass MP validation if not provided by user
+            number: '19119119100' // Generic CPF to pass MP validation se não fornecido
           }
         },
         external_reference: casal.id,
