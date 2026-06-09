@@ -215,13 +215,15 @@
   display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
   border: none; border-radius: 14px;
   font-family: var(--font-display); font-weight: 600; font-size: 21px; letter-spacing: .01em;
-  color: #FFF3EC;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF;
   padding: 17px 20px;
   background: linear-gradient(180deg, var(--accent-deep), var(--accent-deeper));
   box-shadow: 0 10px 24px -10px rgba(126,21,48,.7), inset 0 1px 0 rgba(255,255,255,.18);
   transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
   text-decoration: none;
 }
+.lp-btn, .lp-btn * { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF; }
 .lp-btn:hover { transform: translateY(-2px); filter: brightness(1.06);
   box-shadow: 0 16px 32px -12px rgba(126,21,48,.75), inset 0 1px 0 rgba(255,255,255,.22); }
 .lp-btn:active { transform: translateY(0); }
