@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
     const casalIdForm = (formData.get('casal_id') as string)?.trim()
+    const cpfForm = (formData.get('cpf') as string)?.trim() || '19119119100'
     const admin = getSupabaseAdmin()
 
     let casal_id = ''
@@ -168,7 +169,12 @@ export async function POST(req: NextRequest) {
     const mp = new MercadoPagoConfig({ accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN! })
     const paymentClient = new Payment(mp)
 
-    const expirationDate = new Date(Date.now() + 3 * 60 * 1000)
+    // Aumentar para 30 minutos para evitar que o banco recuse por expiração rápida
+    const expirationDate = new Date(Date.now() + 30 * 60 * 1000)
+
+    // Remover emojis e caracteres especiais que o MP/BACEN pode rejeitar
+    const safeNome1 = (nome1 || 'Cliente').replace(/[^a-zA-ZÀ-ÿ\s]/g, '').substring(0, 50).trim() || 'Cliente'
+    const safeNome2 = (nome2 || 'Casal').replace(/[^a-zA-ZÀ-ÿ\s]/g, '').substring(0, 50).trim() || 'Casal'
 
     const payment = await paymentClient.create({
       body: {
@@ -177,15 +183,15 @@ export async function POST(req: NextRequest) {
         date_of_expiration: expirationDate.toISOString(),
         payer: {
           email,
-          first_name: nome1 || 'Cliente',
-          last_name: nome2 || 'Casal',
+          first_name: safeNome1,
+          last_name: safeNome2,
           identification: {
             type: 'CPF',
-            number: '19119119100' // Generic CPF to pass MP validation se não fornecido
+            number: cpfForm
           }
         },
         external_reference: casal_id,
-        description: `Página Romântica — ${nome1} & ${nome2}`,
+        description: `Página Romântica — ${safeNome1} & ${safeNome2}`,
         notification_url: notificationUrl,
       }
     })

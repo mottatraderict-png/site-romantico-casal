@@ -30,6 +30,7 @@ export default function CheckoutClient({
 }: CheckoutProps) {
   const [payMethod,  setPayMethod]  = useState<'pix' | 'card'>('pix')
   const [email,      setEmail]      = useState('')
+  const [cpf,        setCpf]        = useState('')
   const [whatsapp,   setWhatsapp]   = useState('')
   const [emailError, setEmailError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -94,11 +95,17 @@ export default function CheckoutClient({
       setEmailError('Informe um e-mail válido para receber o link.')
       return
     }
+    const cleanCpf = cpf.replace(/\D/g, '')
+    if (payMethod === 'pix' && cleanCpf.length !== 11) {
+      setEmailError('Para o PIX, o Banco Central exige um CPF válido.')
+      return
+    }
     if (!formData) return
 
     setSubmitting(true)
     formData.set('email', email.trim())
     formData.set('whatsapp', whatsapp.trim())
+    formData.set('cpf', cleanCpf)
 
     const fotoCount = Array.from(formData.keys()).filter(k => k.startsWith('foto_')).length
     if (fotoCount > 0) setStatus(`Enviando ${fotoCount} foto${fotoCount > 1 ? 's' : ''}...`)
@@ -332,13 +339,18 @@ export default function CheckoutClient({
                 <label className="ck-label">Seu e-mail <span style={{ color: 'var(--rose)' }}>*</span></label>
                 <input className="ck-input" type="email" placeholder="voce@email.com"
                   value={email} onChange={e => { setEmail(e.target.value); setEmailError('') }} />
-                {emailError && <span className="ck-error">⚠ {emailError}</span>}
               </div>
               <div>
+                <label className="ck-label">Seu CPF {payMethod === 'pix' && <span style={{ color: 'var(--rose)' }}>*</span>}</label>
+                <input className="ck-input" type="text" placeholder="000.000.000-00" maxLength={14}
+                  value={cpf} onChange={e => { setCpf(e.target.value); setEmailError('') }} />
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
                 <label className="ck-label">WhatsApp <span style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'none', letterSpacing: 0 }}>(opcional)</span></label>
                 <input className="ck-input" type="tel" placeholder="(11) 99999-9999"
                   value={whatsapp} onChange={e => setWhatsapp(e.target.value)} maxLength={20} />
               </div>
+              {emailError && <div className="ck-error" style={{ gridColumn: '1 / -1' }}>⚠ {emailError}</div>}
             </div>
           </div>
 

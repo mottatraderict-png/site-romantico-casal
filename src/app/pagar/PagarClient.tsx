@@ -15,6 +15,8 @@ type Stage = 'form' | 'pix-qr' | 'pix-confirmed'
 
 export default function PagarClient({ casalId, nome1, nome2, email }: PagarProps) {
   const [payMethod, setPayMethod] = useState<'pix' | 'card'>('pix')
+  const [cpf, setCpf] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [status, setStatus] = useState('')
   const [stage, setStage] = useState<Stage>('form')
@@ -61,12 +63,20 @@ export default function PagarClient({ casalId, nome1, nome2, email }: PagarProps
   }, [stage, timeLeft])
 
   async function handlePay() {
+    setErrorMsg('')
+    const cleanCpf = cpf.replace(/\D/g, '')
+    if (payMethod === 'pix' && cleanCpf.length !== 11) {
+      setErrorMsg('Para gerar o PIX, informe um CPF válido.')
+      return
+    }
+
     setSubmitting(true)
     setStatus('Preparando seu pagamento...')
     pixelTrack('Lead', { content_name: 'pagar_retry' })
 
     const formData = new FormData()
     formData.append('casal_id', casalId)
+    formData.append('cpf', cleanCpf)
 
     try {
       if (payMethod === 'pix') {
@@ -200,10 +210,14 @@ export default function PagarClient({ casalId, nome1, nome2, email }: PagarProps
               <div className="ck-pix-box">
                 <span className="ck-pix-icon">⬡</span>
                 <p className="ck-pix-title">QR Code gerado na hora</p>
-                <p className="ck-pix-sub">
-                  Clique em pagar e o QR Code aparece aqui.<br />
-                  Aprovação <b>instantânea</b> — sem redirecionar.
+                <p className="ck-pix-sub" style={{ marginBottom: 16 }}>
+                  O Banco Central exige seu CPF para gerar o PIX.
                 </p>
+                <div>
+                  <label className="ck-label">Seu CPF <span style={{ color: 'var(--rose)' }}>*</span></label>
+                  <input className="ck-input" type="text" placeholder="000.000.000-00" maxLength={14}
+                    value={cpf} onChange={e => { setCpf(e.target.value); setErrorMsg('') }} />
+                </div>
               </div>
             ) : (
               <div className="ck-fields">
@@ -213,6 +227,7 @@ export default function PagarClient({ casalId, nome1, nome2, email }: PagarProps
           </div>
 
           <div className="ck-cta-wrap">
+            {errorMsg && <div className="ck-error" style={{ marginBottom: 16 }}>⚠ {errorMsg}</div>}
             {status && <div className="ck-status">{status}</div>}
             <button className="ck-btn-pay" onClick={handlePay} disabled={submitting}>
               {submitting ? '⏳ Processando...' : payMethod === 'pix' ? '⬡ Gerar QR Code PIX — R$ 19,90' : '🔒 Pagar com Cartão — R$ 19,90'}
