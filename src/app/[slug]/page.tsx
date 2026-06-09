@@ -33,7 +33,11 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   const title = `${casal.nome1} & ${casal.nome2} ♡`
   const description = `A história de amor de ${casal.nome1} e ${casal.nome2} — juntos desde ${new Date(casal.data_inicio + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}`
-  const url = `${process.env.NEXT_PUBLIC_URL}/${casal.slug}`
+
+  // Domínio canônico (nunca vercel.app nos metadados compartilhados)
+  let base = (process.env.NEXT_PUBLIC_URL || 'https://cartadeamor.site').trim().replace(/\/$/, '')
+  if (base.includes('vercel.app') || base.includes('localhost')) base = 'https://cartadeamor.site'
+  const url = `${base}/${casal.slug}`
 
   return {
     title,
