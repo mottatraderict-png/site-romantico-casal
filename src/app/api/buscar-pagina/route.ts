@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
   let query = admin
     .from('casais')
-    .select('slug, nome1, nome2, status, email_cliente, created_at')
+    .select('id, slug, nome1, nome2, status, email_cliente, created_at')
 
   if (casalId) {
     // Busca direta por ID — mais confiável
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   }
 
   if (data.status === 'pendente') {
-    return NextResponse.json({ error: 'Pagamento ainda não confirmado. Aguarde alguns instantes e tente novamente.', status: 'pendente' }, { status: 404 })
+    return NextResponse.json({ error: 'Pagamento ainda não confirmado. Redirecionando...', status: 'pendente', casalId: data.id }, { status: 404 })
   }
 
   // Envia e-mail com o link quando solicitado (cliente na página /sucesso)

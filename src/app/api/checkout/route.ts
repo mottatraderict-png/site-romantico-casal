@@ -13,46 +13,63 @@ export async function POST(req: NextRequest) {
     console.log('[checkout] iniciando...')
 
     const formData = await req.formData()
-    const fdKeys: string[] = []; formData.forEach((_, k) => fdKeys.push(k))
-    console.log('[checkout] formData keys:', fdKeys.join(', '))
+    const casalIdForm = (formData.get('casal_id') as string)?.trim()
 
-    // Debug: contar fotos e marcos recebidos
-    const fotoKeys   = fdKeys.filter(k => k.startsWith('foto_'))
-    const marcoFotoKeys = fdKeys.filter(k => k.startsWith('marco_foto_'))
-    const marcosRaw  = (formData.get('marcos') as string) ?? '[]'
-    console.log('CHECKOUT fotos recebidas:', fotoKeys.length, '| keys:', fotoKeys.join(', '))
-    console.log('CHECKOUT marcos JSON:', marcosRaw)
-    console.log('CHECKOUT marco_fotos recebidas:', marcoFotoKeys.length)
-
-    const email        = (formData.get('email') as string)?.trim()
-    const whatsapp     = (formData.get('whatsapp') as string) ?? ''
-    const nome1        = (formData.get('nome1') as string) ?? ''
-    const nome2        = (formData.get('nome2') as string) ?? ''
-    const apelido1     = (formData.get('apelido1') as string) ?? ''
-    const apelido2     = (formData.get('apelido2') as string) ?? ''
-    const dataInicio   = (formData.get('dataInicio') as string) ?? ''
-    const frase        = (formData.get('frase') as string) ?? ''
-    const cartaPara    = (formData.get('cartaPara') as string) ?? ''
-    const cartaTexto   = (formData.get('cartaTexto') as string) ?? ''
-    const cartaAss     = (formData.get('cartaAss') as string) ?? ''
-    const musicaNome   = (formData.get('musicaNome') as string) ?? ''
-    const musicaArtista = (formData.get('musicaArtista') as string) ?? ''
-    const spotifyTrackId = (formData.get('spotifyTrackId') as string) ?? ''
-    const marcosJson   = (formData.get('marcos') as string) ?? '[]'
-
-    console.log('[checkout] email:', email, '| nome1:', nome1, '| nome2:', nome2)
-
-    if (!email || !email.includes('@')) {
-      return NextResponse.json({ error: 'E-mail inválido' }, { status: 400 })
-    }
-
-    // Verificar env vars
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    console.log('[checkout] SUPABASE_URL presente:', !!supabaseUrl)
-    console.log('[checkout] SERVICE_ROLE_KEY presente:', !!supabaseKey)
+    let casal_id = ''
+    let email = ''
 
     const admin = getSupabaseAdmin()
+
+    if (casalIdForm) {
+      const { data: existente, error: exErr } = await admin
+        .from('casais')
+        .select('id, email_cliente')
+        .eq('id', casalIdForm)
+        .single()
+      if (exErr || !existente) {
+        return NextResponse.json({ error: 'Pedido não encontrado' }, { status: 404 })
+      }
+      casal_id = existente.id
+      email = existente.email_cliente
+    } else {
+      const fdKeys: string[] = []; formData.forEach((_, k) => fdKeys.push(k))
+      console.log('[checkout] formData keys:', fdKeys.join(', '))
+
+      const fotoKeys   = fdKeys.filter(k => k.startsWith('foto_'))
+      const marcoFotoKeys = fdKeys.filter(k => k.startsWith('marco_foto_'))
+      const marcosRaw  = (formData.get('marcos') as string) ?? '[]'
+      console.log('CHECKOUT fotos recebidas:', fotoKeys.length, '| keys:', fotoKeys.join(', '))
+      console.log('CHECKOUT marcos JSON:', marcosRaw)
+      console.log('CHECKOUT marco_fotos recebidas:', marcoFotoKeys.length)
+
+      email        = (formData.get('email') as string)?.trim() || ''
+      const whatsapp     = (formData.get('whatsapp') as string) ?? ''
+      const nome1        = (formData.get('nome1') as string) ?? ''
+      const nome2        = (formData.get('nome2') as string) ?? ''
+      const apelido1     = (formData.get('apelido1') as string) ?? ''
+      const apelido2     = (formData.get('apelido2') as string) ?? ''
+      const dataInicio   = (formData.get('dataInicio') as string) ?? ''
+      const frase        = (formData.get('frase') as string) ?? ''
+      const cartaPara    = (formData.get('cartaPara') as string) ?? ''
+      const cartaTexto   = (formData.get('cartaTexto') as string) ?? ''
+      const cartaAss     = (formData.get('cartaAss') as string) ?? ''
+      const musicaNome   = (formData.get('musicaNome') as string) ?? ''
+      const musicaArtista = (formData.get('musicaArtista') as string) ?? ''
+      const spotifyTrackId = (formData.get('spotifyTrackId') as string) ?? ''
+      const marcosJson   = (formData.get('marcos') as string) ?? '[]'
+
+      console.log('[checkout] email:', email, '| nome1:', nome1, '| nome2:', nome2)
+
+      if (!email || !email.includes('@')) {
+        return NextResponse.json({ error: 'E-mail inválido' }, { status: 400 })
+      }
+
+    // Verificar env vars
+      // Verificar env vars
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+      console.log('[checkout] SUPABASE_URL presente:', !!supabaseUrl)
+      console.log('[checkout] SERVICE_ROLE_KEY presente:', !!supabaseKey)
 
     // Upload das fotos
     const fotosUploaded: { url: string; caption: string; ordem: number }[] = []
@@ -131,13 +148,14 @@ export async function POST(req: NextRequest) {
         hint: insertError?.hint,
       }, { status: 500 })
     }
-    console.log('[checkout] casal inserido, id:', casal.id)
+      casal_id = casal.id
+      console.log('[checkout] casal inserido, id:', casal_id)
 
-    // Inserir fotos
-    if (fotosUploaded.length > 0) {
-      const { error: fotosError } = await admin.from('fotos').insert(
-        fotosUploaded.map((f, i) => ({
-          casal_id: casal.id,
+      // Inserir fotos
+      if (fotosUploaded.length > 0) {
+        const { error: fotosError } = await admin.from('fotos').insert(
+          fotosUploaded.map((f, i) => ({
+            casal_id: casal_id,
           url: f.url,
           caption: f.caption || null,
           ordem: i,
@@ -170,24 +188,25 @@ export async function POST(req: NextRequest) {
       marcoFotoIdx++
     }
 
-    // Inserir marcos
-    const marcos = JSON.parse(marcosJson) as { data: string; titulo: string; desc: string }[]
-    const marcosValidos = marcos.filter((m) => m.titulo.trim())
-    if (marcosValidos.length > 0) {
-      const { error: marcosError } = await admin.from('marcos').insert(
-        marcosValidos.map((m, i) => ({
-          casal_id: casal.id,
-          data_texto: m.data.trim() || null,
-          titulo: m.titulo.trim(),
-          descricao: m.desc.trim() || null,
-          foto_url: marcoFotoUrls[i] || null,
-          ordem: i,
-        }))
-      )
-      if (marcosError) {
-        console.error('[checkout] erro insert marcos:', JSON.stringify(marcosError))
-      } else {
-        console.log('[checkout] marcos inseridos ok:', marcosValidos.length)
+      // Inserir marcos
+      const marcos = JSON.parse(marcosJson) as { data: string; titulo: string; desc: string }[]
+      const marcosValidos = marcos.filter((m) => m.titulo.trim())
+      if (marcosValidos.length > 0) {
+        const { error: marcosError } = await admin.from('marcos').insert(
+          marcosValidos.map((m, i) => ({
+            casal_id: casal_id,
+            data_texto: m.data.trim() || null,
+            titulo: m.titulo.trim(),
+            descricao: m.desc.trim() || null,
+            foto_url: marcoFotoUrls[i] || null,
+            ordem: i,
+          }))
+        )
+        if (marcosError) {
+          console.error('[checkout] erro insert marcos:', JSON.stringify(marcosError))
+        } else {
+          console.log('[checkout] marcos inseridos ok:', marcosValidos.length)
+        }
       }
     }
 
@@ -224,11 +243,11 @@ export async function POST(req: NextRequest) {
             currency_id: 'BRL',
           }],
           payer: { email: email },
-          external_reference: casal.id,
+          external_reference: casal_id,
           back_urls: {
-            success: `${baseUrl}/sucesso?casal_id=${casal.id}`,
-            failure: `${baseUrl}/sucesso?casal_id=${casal.id}`,
-            pending: `${baseUrl}/sucesso?casal_id=${casal.id}`,
+            success: `${baseUrl}/sucesso?casal_id=${casal_id}`,
+            failure: `${baseUrl}/sucesso?casal_id=${casal_id}`,
+            pending: `${baseUrl}/sucesso?casal_id=${casal_id}`,
           },
           auto_return: 'approved',
           notification_url: notificationUrl,
@@ -236,7 +255,7 @@ export async function POST(req: NextRequest) {
       })
       if (pref.init_point) {
         checkoutUrl = pref.init_point
-        console.log('[checkout] preferência MP criada, external_reference:', casal.id)
+        console.log('[checkout] preferência MP criada, external_reference:', casal_id)
       }
     } catch (mpErr) {
       console.error('[checkout] erro ao criar preferência MP:', JSON.stringify(mpErr, null, 2))
@@ -245,7 +264,7 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('[checkout] tudo ok, retornando casal_id e checkoutUrl')
-    return NextResponse.json({ checkoutUrl, casalId: casal.id })
+    return NextResponse.json({ checkoutUrl, casalId: casal_id })
 
   } catch (err: unknown) {
     const e = err as { message?: string; code?: string; hint?: string }

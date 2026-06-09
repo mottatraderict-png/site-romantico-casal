@@ -241,6 +241,11 @@ export default function LandingPage() {
               <span><span className="ico">🔒</span> Pagamento seguro via Mercado Pago · PIX ou cartão</span>
               <span><span className="ico">✓</span> Você preenche tudo antes de pagar</span>
             </div>
+            <div style={{ marginTop: 24, textAlign: 'center' }}>
+              <Link href="/buscar" style={{ fontSize: 14, color: 'var(--rose-light)', textDecoration: 'underline', fontStyle: 'italic', opacity: 0.9 }}>
+                Já fez seu pedido? Encontre sua página aqui.
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -429,6 +434,11 @@ export default function LandingPage() {
             <div className="lp-trust">
               <span><span className="ico">✓</span> Você preenche tudo primeiro, paga só no final</span>
               <span><span className="ico">🔒</span> PIX ou cartão · Mercado Pago</span>
+            </div>
+            <div style={{ marginTop: 24, textAlign: 'center' }}>
+              <Link href="/buscar" style={{ fontSize: 14, color: 'var(--rose-light)', textDecoration: 'underline', fontStyle: 'italic', opacity: 0.9 }}>
+                Já fez seu pedido? Encontre sua página aqui.
+              </Link>
             </div>
           </div>
         </div>

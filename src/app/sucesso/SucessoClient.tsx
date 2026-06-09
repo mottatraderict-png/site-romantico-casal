@@ -151,6 +151,10 @@ export default function SucessoClient({ slug, qrDataUrl, casalId, mpUrl }: { slu
       const res = await fetch(`/api/buscar-pagina?email=${encodeURIComponent(email.trim())}&sendEmail=1`)
       const json = await res.json()
       if (!res.ok || !json.slug) {
+        if (json.status === 'pendente' && json.casalId) {
+          window.location.href = `/pagar?casal_id=${json.casalId}`
+          return
+        }
         setBuscaStatus('')
         setBuscaErro(json.error ?? 'Nenhuma página encontrada para este e-mail.')
         setBuscando(false)
