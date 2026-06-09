@@ -65,18 +65,15 @@ export default function CasalPageClient({ casal }: { casal: CasalCompleto }) {
       }, 800)
     }, 900)
 
-    // Autoplay Spotify — setTimeout separado de 1200ms
+    // Autoplay Spotify — dispara após interação do usuário (clique no envelope)
+    // Usamos um pequeno delay para garantir que o navegador processe o gesto do usuário
     setTimeout(() => {
-      const musicSection = document.querySelector('.music-section')
-      if (musicSection) {
-        musicSection.classList.add('visible')
-        musicSection.classList.remove('reveal')
-      }
       const iframe = document.getElementById('spotify-player') as HTMLIFrameElement
       if (iframe && casal.spotify_track_id) {
+        // Força recarregamento com autoplay=1 — funciona pois há gesto do usuário
         iframe.src = `https://open.spotify.com/embed/track/${casal.spotify_track_id}?utm_source=generator&theme=0&autoplay=1`
       }
-    }, 1200)
+    }, 800)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened])
 
@@ -123,12 +120,17 @@ export default function CasalPageClient({ casal }: { casal: CasalCompleto }) {
     if (!opened) return
     const obs = new IntersectionObserver(
       (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target) } }),
-      { threshold: 0.1 }
+      { threshold: 0.05 }
     )
     setTimeout(() => {
       document.querySelectorAll('.reveal, .tl-item').forEach((el) => obs.observe(el))
     }, 200)
-    return () => obs.disconnect()
+    // Fallback: após 3s força todos os reveals a aparecerem (caso IntersectionObserver não dispare)
+    const fallback = setTimeout(() => {
+      document.querySelectorAll('.reveal, .tl-item').forEach((el) => el.classList.add('visible'))
+      obs.disconnect()
+    }, 3000)
+    return () => { obs.disconnect(); clearTimeout(fallback) }
   }, [opened])
 
   // ── CANVAS RESIZE ────────────────────────────────────────────
@@ -310,7 +312,6 @@ export default function CasalPageClient({ casal }: { casal: CasalCompleto }) {
                   height="80"
                   frameBorder={0}
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                  loading="lazy"
                 />
               </div>
             </div>

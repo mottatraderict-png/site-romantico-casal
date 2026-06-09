@@ -7,17 +7,23 @@ import CasalPageClient from './CasalPageClient'
 async function getCasal(slug: string): Promise<CasalCompleto | null> {
   const { data: casal, error } = await supabaseAdmin
     .from('casais')
-    .select('*, fotos(*), marcos(*)')
+    .select('*')
     .eq('slug', slug)
     .eq('status', 'publicado')
     .single()
 
   if (error || !casal) return null
 
+  // Busca fotos e marcos em queries separadas (mais robusto que nested select)
+  const [{ data: fotos }, { data: marcos }] = await Promise.all([
+    supabaseAdmin.from('fotos').select('*').eq('casal_id', casal.id).order('ordem'),
+    supabaseAdmin.from('marcos').select('*').eq('casal_id', casal.id).order('ordem'),
+  ])
+
   return {
     ...casal,
-    fotos:  (casal.fotos  ?? []),
-    marcos: (casal.marcos ?? []),
+    fotos:  fotos  ?? [],
+    marcos: marcos ?? [],
   }
 }
 
