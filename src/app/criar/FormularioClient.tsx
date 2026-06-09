@@ -83,7 +83,7 @@ export default function FormularioClient() {
         if (draft.dataInicio) setDataInicio(draft.dataInicio)
         if (draft.frase) setFrase(draft.frase)
         if (draft.marcos && draft.marcos.length > 0) {
-          const cleanMarcos = draft.marcos.map((m: any) => ({
+          const cleanMarcos = draft.marcos.map((m: { data?: string; titulo?: string; desc?: string }) => ({
             data: m.data ?? '',
             titulo: m.titulo ?? '',
             desc: m.desc ?? ''
