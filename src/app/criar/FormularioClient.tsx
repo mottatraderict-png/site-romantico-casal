@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { pixelTrack } from '@/lib/pixel'
+import CheckoutClient from '@/app/checkout/CheckoutClient'
 import '@/styles/formulario.css'
 
 interface Marco { data: string; titulo: string; desc: string; foto_url?: string; foto_preview?: string }
@@ -68,12 +69,7 @@ export default function FormularioClient() {
   const [musicaNome,      setMusicaNome]      = useState('')
   const [musicaArtista,   setMusicaArtista]   = useState('')
 
-  // Step 6
-  const [email,       setEmail]       = useState('')
-  const [whatsapp,    setWhatsapp]    = useState('')
-  const [emailError,  setEmailError]  = useState('')
-  const [submitting,  setSubmitting]  = useState(false)
-  const [submitStatus,setSubmitStatus]= useState('')
+  // Step 6 — contact/payment handled by CheckoutClient
 
   // ── FOTOS ────────────────────────────────────────────────────
   function triggerUpload(idx: number) {
@@ -149,45 +145,6 @@ export default function FormularioClient() {
   }
   function usarCarta() { setCartaTexto(cartaGerada); setModoIA(false) }
 
-  // ── SUBMIT ───────────────────────────────────────────────────
-  async function handleSubmit() {
-    setEmailError('')
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setEmailError('Informe um e-mail válido para receber o link da página.')
-      return
-    }
-    setSubmitting(true); setSubmitStatus('Preparando seus dados...')
-    try {
-      const fd = new FormData()
-      fd.append('email', email.trim()); fd.append('whatsapp', whatsapp.trim())
-      fd.append('nome1', nome1.trim()); fd.append('nome2', nome2.trim())
-      fd.append('apelido1', apelido1.trim()); fd.append('apelido2', apelido2.trim())
-      fd.append('dataInicio', dataInicio); fd.append('frase', frase.trim())
-      fd.append('cartaPara', cartaPara.trim())
-      fd.append('cartaTexto', (modoIA ? cartaGerada : cartaTexto).trim())
-      fd.append('cartaAss', cartaAss.trim())
-      fd.append('musicaNome', musicaNome.trim()); fd.append('musicaArtista', musicaArtista.trim())
-      fd.append('spotifyTrackId', spotifyTrackId)
-      fd.append('marcos', JSON.stringify(marcos.map(m => ({ data: m.data, titulo: m.titulo, desc: m.desc }))))
-      marcoFiles.forEach((file, i) => { if (file) fd.append(`marco_foto_${i}`, file) })
-      const fotosValidas = photos.filter(Boolean) as Photo[]
-      setSubmitStatus(`Enviando ${fotosValidas.length > 0 ? fotosValidas.length + ' fotos...' : 'dados...'}`)
-      fotosValidas.forEach((foto, i) => fd.append(`foto_${i}`, foto.file))
-      setSubmitStatus('Gerando seu link de pagamento...')
-      pixelTrack('Lead', { content_name: 'submit_form' })
-      const res = await fetch('/api/checkout', { method: 'POST', body: fd })
-      const json = await res.json()
-      if (!res.ok || !json.checkoutUrl) throw new Error(json.error ?? 'Erro ao gerar pagamento')
-      // Redireciona para /sucesso?casal_id=XXX — o usuário volta para cá após pagar no MP
-      const sucessoUrl = `/sucesso?casal_id=${json.casalId}&mp=${encodeURIComponent(json.checkoutUrl)}`
-      window.location.href = sucessoUrl
-    } catch (err) {
-      console.error(err)
-      setSubmitStatus('Erro ao processar. Tente novamente.')
-      setSubmitting(false)
-    }
-  }
-
   // ── HELPERS ──────────────────────────────────────────────────
   function formatPrevDate(d: string) {
     if (!d) return ''
@@ -209,6 +166,34 @@ export default function FormularioClient() {
   const cartaFinal     = (modoIA ? cartaGerada : cartaTexto).trim()
 
   // ── RENDER ───────────────────────────────────────────────────
+  // Step 6 = checkout page completa fora do layout do formulário
+  if (step === 5) {
+    const fd = new FormData()
+    fd.append('nome1', nome1.trim()); fd.append('nome2', nome2.trim())
+    fd.append('apelido1', apelido1.trim()); fd.append('apelido2', apelido2.trim())
+    fd.append('dataInicio', dataInicio); fd.append('frase', frase.trim())
+    fd.append('cartaPara', cartaPara.trim())
+    fd.append('cartaTexto', cartaFinal.trim())
+    fd.append('cartaAss', cartaAss.trim())
+    fd.append('musicaNome', musicaNome.trim()); fd.append('musicaArtista', musicaArtista.trim())
+    fd.append('spotifyTrackId', spotifyTrackId)
+    fd.append('marcos', JSON.stringify(marcos.map(m => ({ data: m.data, titulo: m.titulo, desc: m.desc }))))
+    marcoFiles.forEach((file, i) => { if (file) fd.append(`marco_foto_${i}`, file) })
+    fotosValidas.forEach((foto, i) => fd.append(`foto_${i}`, foto.file))
+    return (
+      <CheckoutClient
+        nome1={nome1} nome2={nome2}
+        dataInicio={dataInicio}
+        fotosCount={fotosValidas.length}
+        marcosCount={marcosValidos.length}
+        temCarta={!!cartaFinal}
+        temMusica={musicaNome}
+        formData={fd}
+        onBack={() => goNext(4)}
+      />
+    )
+  }
+
   return (
     <div className="form-root">
       {/* Fairy lights */}
@@ -527,91 +512,6 @@ export default function FormularioClient() {
             </div>
           )}
 
-          {/* ── STEP 6 — FINALIZAR ── */}
-          {step === 5 && (
-            <div className="step-block step-final">
-              <div className="step-icon-hero">{STEP_ICONS[5]}</div>
-              <div className="final-header">
-                <span className="final-tag">quase lá</span>
-                <h2 className="step-heading">Revise e finalize</h2>
-                <p className="step-sub">Confira o resumo e informe seu e-mail para receber a página após o pagamento.</p>
-              </div>
-
-              {/* Resumo */}
-              <div className="resumo-card">
-                <div className="resumo-names">
-                  <span className="resumo-heart">♥</span>
-                  <span className="resumo-casal">{nome1 || 'Ela'} &amp; {nome2 || 'Ele'}</span>
-                </div>
-                {dataInicio && (
-                  <p className="resumo-date">
-                    Juntos desde {formatPrevDate(dataInicio)}
-                    <span className="resumo-dias"> · {daysTogether(dataInicio).toLocaleString('pt-BR')} dias</span>
-                  </p>
-                )}
-                <div className="resumo-grid">
-                  <div className="resumo-item">
-                    <span className="resumo-num">{fotosValidas.length}</span>
-                    <span className="resumo-unit">foto{fotosValidas.length !== 1 ? 's' : ''}</span>
-                  </div>
-                  <div className="resumo-item">
-                    <span className="resumo-num">{marcosValidos.length}</span>
-                    <span className="resumo-unit">momento{marcosValidos.length !== 1 ? 's' : ''}</span>
-                  </div>
-                  {cartaFinal && (
-                    <div className="resumo-item">
-                      <span className="resumo-num">✓</span>
-                      <span className="resumo-unit">cartinha</span>
-                    </div>
-                  )}
-                  {musicaNome && (
-                    <div className="resumo-item">
-                      <span className="resumo-num">♪</span>
-                      <span className="resumo-unit">{musicaNome}</span>
-                    </div>
-                  )}
-                </div>
-                {cartaFinal && (
-                  <p className="resumo-carta-preview">
-                    &ldquo;{cartaFinal.slice(0, 80)}{cartaFinal.length > 80 ? '...' : ''}&rdquo;
-                  </p>
-                )}
-              </div>
-
-              {/* Preço */}
-              <div className="preco-box">
-                <span className="preco-valor">R$ 19,90</span>
-                <span className="preco-desc">Entrega instantânea após o pagamento</span>
-              </div>
-
-              {/* Contato */}
-              <div className="field">
-                <label className="field-label">Seu e-mail <span className="required">*</span></label>
-                <input
-                  className="field-input"
-                  type="email" value={email}
-                  onChange={e => { setEmail(e.target.value); setEmailError('') }}
-                  placeholder="voce@email.com"
-                />
-                {emailError && <span className="field-error">⚠ {emailError}</span>}
-                <p className="field-hint">O link da sua página será enviado para este e-mail após o pagamento.</p>
-              </div>
-              <div className="field">
-                <label className="field-label">WhatsApp <span className="field-opt">(opcional)</span></label>
-                <input className="field-input" type="tel" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="(11) 99999-9999" maxLength={20} />
-              </div>
-
-              {submitStatus && <p className="submit-status">{submitStatus}</p>}
-
-              <div className="nav-btns nav-btns-final">
-                <button className="btn-prev" onClick={() => goNext(4)}>← Voltar</button>
-                <button className="btn-submit" onClick={handleSubmit} disabled={submitting}>
-                  {submitting ? '⏳ Processando...' : 'Criar nossa página e pagar ♡'}
-                </button>
-              </div>
-              <p className="trust-line">🔒 Pagamento seguro · Mercado Pago · PIX e cartão</p>
-            </div>
-          )}
         </div>
 
         {/* ══ COLUNA PREVIEW ══ */}

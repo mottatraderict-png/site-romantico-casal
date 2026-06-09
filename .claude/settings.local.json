@@ -29,7 +29,9 @@
       "Bash(del \"C:\\\\Users\\\\Notebook Gamer\\\\Documents\\\\site casal\\\\.env.vercel.tmp\")",
       "Bash(git init *)",
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(git -C /Users/syntax/romantico status)",
+      "Bash(git -C /Users/syntax/romantico log --oneline origin/main..HEAD)"
     ]
   }
 }
