@@ -16,6 +16,8 @@ const STEP_LABELS = [
   'Finalizar e Pagar',
 ]
 
+const STEP_ICONS = ['💑', '📷', '📖', '💌', '🎵', '🌹']
+
 const TOM_OPTS = [
   { value: 'romantico', label: 'Romântico e apaixonado' },
   { value: 'poetico',   label: 'Poético e metafórico' },
@@ -227,8 +229,7 @@ export default function FormularioClient() {
 
           {/* Cabeçalho */}
           <div className="form-header">
-            <span className="form-eyebrow">crie sua página</span>
-            <h1 className="form-title">Conte a história<br />de vocês</h1>
+            <span className="form-eyebrow">Nossa Página</span>
           </div>
 
           {/* Barra de progresso */}
@@ -244,9 +245,11 @@ export default function FormularioClient() {
           {/* ── STEP 1 — O CASAL ── */}
           {step === 0 && (
             <div className="step-block">
+              <div className="step-icon-hero">{STEP_ICONS[0]}</div>
               <h2 className="step-heading">O casal</h2>
               <p className="step-sub">Como vocês se chamam? Vamos começar pelo começo.</p>
 
+              <div className="fields-card">
               <div className="field-row">
                 <div className="field">
                   <label className="field-label">Nome dela <span className="required">*</span></label>
@@ -276,6 +279,8 @@ export default function FormularioClient() {
                 <input className="field-input" type="text" value={frase} onChange={e => setFrase(e.target.value)} placeholder="ex: para sempre e um dia a mais..." maxLength={120} />
               </div>
 
+              </div>{/* /fields-card */}
+
               <div className="nav-btns">
                 <button className="btn-next" onClick={() => goNext(1)} disabled={!nome1.trim() || !nome2.trim() || !dataInicio}>
                   Próximo →
@@ -287,6 +292,7 @@ export default function FormularioClient() {
           {/* ── STEP 2 — FOTOS ── */}
           {step === 1 && (
             <div className="step-block">
+              <div className="step-icon-hero">{STEP_ICONS[1]}</div>
               <h2 className="step-heading">As fotos de vocês</h2>
               <p className="step-sub">Adicione até 15 fotos dos momentos que mais gosta. Elas aparecem como polaroids na página.</p>
 
@@ -333,6 +339,7 @@ export default function FormularioClient() {
           {/* ── STEP 3 — HISTÓRIA ── */}
           {step === 2 && (
             <div className="step-block">
+              <div className="step-icon-hero">{STEP_ICONS[2]}</div>
               <h2 className="step-heading">Os momentos marcantes</h2>
               <p className="step-sub">Quais foram os momentos que definiram a história de vocês? Adicione até 5.</p>
 
@@ -397,6 +404,7 @@ export default function FormularioClient() {
           {/* ── STEP 4 — CARTA ── */}
           {step === 3 && (
             <div className="step-block">
+              <div className="step-icon-hero">{STEP_ICONS[3]}</div>
               <h2 className="step-heading">A cartinha</h2>
               <p className="step-sub">Escreva uma mensagem do coração ou deixe a IA criar uma carta personalizada.</p>
 
@@ -478,9 +486,11 @@ export default function FormularioClient() {
           {/* ── STEP 5 — MÚSICA ── */}
           {step === 4 && (
             <div className="step-block">
+              <div className="step-icon-hero">{STEP_ICONS[4]}</div>
               <h2 className="step-heading">A música de vocês</h2>
               <p className="step-sub">Cole o link do Spotify da música que é de vocês.</p>
 
+              <div className="fields-card">
               <div className="field">
                 <label className="field-label">Link do Spotify</label>
                 <input className="field-input" type="text" value={spotifyUrl} onChange={e => handleSpotifyInput(e.target.value)} placeholder="https://open.spotify.com/track/..." />
@@ -508,6 +518,8 @@ export default function FormularioClient() {
                 </div>
               </div>
 
+              </div>{/* /fields-card */}
+
               <div className="nav-btns">
                 <button className="btn-prev" onClick={() => goNext(3)}>← Voltar</button>
                 <button className="btn-next" onClick={() => goNext(5)}>Próximo →</button>
@@ -518,6 +530,7 @@ export default function FormularioClient() {
           {/* ── STEP 6 — FINALIZAR ── */}
           {step === 5 && (
             <div className="step-block step-final">
+              <div className="step-icon-hero">{STEP_ICONS[5]}</div>
               <div className="final-header">
                 <span className="final-tag">quase lá</span>
                 <h2 className="step-heading">Revise e finalize</h2>
