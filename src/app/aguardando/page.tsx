@@ -6,7 +6,7 @@ export default function AguardandoPage() {
       <div className="vignette" />
       <div className="token-error">
         <div style={{ fontSize: 56 }}>⏳</div>
-        <h1 style={{ fontFamily: 'var(--serif)', fontSize: 32, fontStyle: 'italic', color: 'var(--cream)' }}>
+        <h1 style={{ fontFamily: 'var(--serif)', fontSize: 32, fontStyle: 'italic', color: 'var(--text)' }}>
           Pagamento em processamento
         </h1>
         <p style={{ color: 'var(--text-soft)', fontStyle: 'italic', fontSize: 15, lineHeight: 1.7, maxWidth: 400 }}>

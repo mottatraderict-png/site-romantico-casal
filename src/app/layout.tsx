@@ -7,12 +7,20 @@ export const metadata: Metadata = {
   description: 'Crie uma página de amor personalizada para o casal',
 }
 
+// Google Fonts carregadas via preconnect + stylesheet para máxima performance
+const GOOGLE_FONTS_URL =
+  'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500&display=swap'
+
 const PIXEL_ID = '2743976665994857'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
-      <head />
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href={GOOGLE_FONTS_URL} rel="stylesheet" />
+      </head>
       <body>
         {children}
         {/* Meta Pixel */}

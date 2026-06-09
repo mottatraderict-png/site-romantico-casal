@@ -203,7 +203,7 @@ export default function SucessoClient({ slug, qrDataUrl, casalId, mpUrl }: { slu
       <div style={{ textAlign: 'center', padding: '80px 24px', maxWidth: 520, zIndex: 2, position: 'relative', width: '100%' }}>
         <div style={{ fontSize: 56, marginBottom: 24, animation: 'heartbeat 1.4s ease-in-out infinite', display: 'inline-block' }}>🌹</div>
 
-        <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(26px,5vw,34px)', fontStyle: 'italic', color: 'var(--cream)', marginBottom: 12 }}>
+        <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(26px,5vw,34px)', fontStyle: 'italic', color: 'var(--text)', marginBottom: 12 }}>
           {foundSlug ? 'A página está pronta! ♡' : casalId ? 'Quase lá...' : 'Pagamento aprovado! ♡'}
         </h1>
 
