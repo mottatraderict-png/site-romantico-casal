@@ -1,5 +1,9 @@
-// Tracking leve de funil para o painel admin (independente do Meta Pixel).
+// Tracking leve de funil. Envia para 2 destinos:
+//  1. Vercel Analytics (aparece no painel da Vercel, ZERO configuração)
+//  2. Nossa tabela `eventos` no Supabase (alimenta o /admin) — opcional
 // Não bloqueia nada: falhas são silenciosas.
+
+import { track as vercelTrack } from '@vercel/analytics'
 
 function getSessionId(): string {
   if (typeof window === 'undefined') return ''
@@ -17,6 +21,13 @@ function getSessionId(): string {
 
 export function track(tipo: 'page_view' | 'form_open' | 'checkout_reached') {
   if (typeof window === 'undefined') return
+
+  // 1) Vercel Analytics — evento de funil (page_view já é automático via <Analytics/>)
+  try {
+    if (tipo !== 'page_view') vercelTrack(tipo)
+  } catch { /* silencioso */ }
+
+  // 2) Nossa tabela eventos (alimenta o /admin) — opcional, falha silenciosa
   try {
     fetch('/api/track', {
       method: 'POST',

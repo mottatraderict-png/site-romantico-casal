@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
+import { Analytics } from '@vercel/analytics/react'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -23,6 +24,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         {children}
+        {/* Vercel Web Analytics — page views automáticos + eventos de funil */}
+        <Analytics />
         {/* Meta Pixel */}
         <Script id="meta-pixel" strategy="afterInteractive">
           {`
