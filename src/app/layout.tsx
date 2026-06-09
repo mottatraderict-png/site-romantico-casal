@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/react'
+import WhatsAppButton from './WhatsAppButton'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -24,6 +25,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         {children}
+        {/* Botão flutuante de suporte via WhatsApp */}
+        <WhatsAppButton />
         {/* Vercel Web Analytics — page views automáticos + eventos de funil */}
         <Analytics />
         {/* Meta Pixel */}
