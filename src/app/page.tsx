@@ -59,7 +59,7 @@ export default function LandingPage() {
     <div className="lp">
       {/* URGENCY BAR */}
       <div className="lp-urgency">
-        🌹 <strong>Dia dos Namorados é dia 12 de junho</strong> — garanta sua página romântica antes que acabe o tempo ♡
+        🌹 <strong>Dia dos Namorados é dia 12 de junho</strong> — faltam poucos dias, garanta já a sua página ♡
       </div>
 
       {/* FAIRY LIGHTS */}
