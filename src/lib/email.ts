@@ -1,29 +1,13 @@
 import { Resend } from 'resend'
+import { getBaseUrl } from '@/lib/baseUrl'
 
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY)
 }
 
-// Domínio canônico do projeto — nunca usamos vercel.app em links de e-mail
-// (links *.vercel.app são um gatilho clássico de filtros de spam)
-const CANONICAL_DOMAIN = 'cartadeamor.site'
-
 const FROM = () => (process.env.RESEND_FROM || 'Carta de Amor <contato@cartadeamor.site>').trim()
 const REPLY_TO = () => (process.env.RESEND_REPLY_TO || 'contato@cartadeamor.site').trim()
-
-const BASE_URL = () => {
-  let rawUrl = (process.env.NEXT_PUBLIC_URL || '').trim()
-  if (!rawUrl) rawUrl = `https://${CANONICAL_DOMAIN}`
-  if (!rawUrl.startsWith('http')) rawUrl = `https://${rawUrl}`
-  let url = rawUrl.replace(/\/$/, '')
-
-  // Substitui qualquer host *.vercel.app (ou localhost) pelo domínio canônico,
-  // garantindo que os links no e-mail sejam sempre do domínio verificado.
-  if (url.includes('vercel.app') || url.includes('localhost') || url.includes('127.0.0.1')) {
-    url = `https://${CANONICAL_DOMAIN}`
-  }
-  return url
-}
+const BASE_URL = getBaseUrl
 
 export async function enviarEmailPagina(
   email: string,

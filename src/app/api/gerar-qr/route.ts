@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import QRCode from 'qrcode'
+import { getBaseUrl } from '@/lib/baseUrl'
 
 export async function GET(req: NextRequest) {
   const slug = req.nextUrl.searchParams.get('slug')
   if (!slug) return NextResponse.json({ error: 'slug obrigatório' }, { status: 400 })
 
-  const baseUrl = process.env.NEXT_PUBLIC_URL ?? 'https://site-romantico-casal.vercel.app'
-  const link = `${baseUrl}/${slug}`
+  const link = `${getBaseUrl()}/${slug}`
 
   const qrDataUrl = await QRCode.toDataURL(link, {
     width: 400,
