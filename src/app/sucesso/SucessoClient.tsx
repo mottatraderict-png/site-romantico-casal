@@ -301,7 +301,7 @@ export default function SucessoClient({ slug, qrDataUrl, casalId, mpUrl }: { slu
               </div>
             )}
             {mpUrl && buscando && (
-              <a href={mpUrl} target="_blank" rel="noopener noreferrer" style={{ ...btnStyle, display: 'inline-block', marginTop: 8, textDecoration: 'none' }}>
+              <a href={mpUrl} target="_blank" rel="noopener noreferrer" style={{ ...btnSolid, display: 'inline-block', marginTop: 8, textDecoration: 'none' }}>
                 Abrir Mercado Pago →
               </a>
             )}
