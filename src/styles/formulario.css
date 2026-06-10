@@ -398,3 +398,53 @@
   .field-row   { grid-template-columns: 1fr; }
   .form-panel  { padding: 16px 16px 40px; }
 }
+
+/* ── MODAL DE RASCUNHO ────────────────────────────────────── */
+.draft-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(30, 10, 15, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  animation: draftFade 0.25s ease both;
+}
+@keyframes draftFade { from { opacity: 0 } to { opacity: 1 } }
+
+.draft-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 28px 28px;
+  max-width: 380px; width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: draftPop 0.35s cubic-bezier(0.34,1.4,0.64,1) both;
+}
+@keyframes draftPop { from { opacity: 0; transform: translateY(20px) scale(0.96) } to { opacity: 1; transform: none } }
+
+.draft-modal-icon { font-size: 44px; margin-bottom: 14px; }
+.draft-modal-title {
+  font-family: var(--serif); font-size: 24px; font-style: italic;
+  font-weight: 300; color: var(--text); margin-bottom: 10px;
+}
+.draft-modal-sub {
+  font-size: 13.5px; color: var(--text-soft); line-height: 1.6; margin-bottom: 26px;
+}
+.draft-modal-sub strong { color: var(--rose); font-weight: 600; }
+.draft-modal-actions { display: flex; flex-direction: column; gap: 10px; }
+.draft-btn-primary {
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, var(--rose-light), var(--rose));
+  border: none; border-radius: 99px; cursor: pointer;
+  font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #fff;
+  box-shadow: 0 6px 20px rgba(192,39,74,0.3);
+  transition: opacity 0.2s, transform 0.15s;
+}
+.draft-btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+.draft-btn-ghost {
+  width: 100%; padding: 13px;
+  background: none; border: 1.5px solid var(--border); border-radius: 99px;
+  cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-soft);
+  transition: all 0.2s;
+}
+.draft-btn-ghost:hover { border-color: var(--rose); color: var(--rose); background: var(--rose-pale); }

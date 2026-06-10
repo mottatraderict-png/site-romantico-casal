@@ -74,55 +74,82 @@ export default function FormularioClient() {
   const [musicaArtista,   setMusicaArtista]   = useState('')
 
   // ── RASCUNHO (LOCALSTORAGE) ──────────────────────────────────
-  // Carrega o rascunho após a montagem do componente (evita erros de SSR)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [pendingDraft, setPendingDraft] = useState<any | null>(null)
+  const [showDraftModal, setShowDraftModal] = useState(false)
+  const [draftLoaded, setDraftLoaded] = useState(false) // libera o autosave só após decisão
+
+  // Ao montar: se houver rascunho com conteúdo, pergunta antes de carregar
   useEffect(() => {
     try {
       const saved = localStorage.getItem('form_casal_draft')
       if (saved) {
         const draft = JSON.parse(saved)
-        if (draft.nome1) setNome1(draft.nome1)
-        if (draft.nome2) setNome2(draft.nome2)
-        if (draft.apelido1) setApelido1(draft.apelido1)
-        if (draft.apelido2) setApelido2(draft.apelido2)
-        if (draft.dataInicio) setDataInicio(draft.dataInicio)
-        if (draft.frase) setFrase(draft.frase)
-        if (draft.marcos && draft.marcos.length > 0) {
-          const cleanMarcos = draft.marcos.map((m: { data?: string; titulo?: string; desc?: string }) => ({
-            data: m.data ?? '',
-            titulo: m.titulo ?? '',
-            desc: m.desc ?? ''
-          }))
-          setMarcos(cleanMarcos)
-          setMarcoFiles(Array(cleanMarcos.length).fill(null))
+        const temConteudo = draft.nome1 || draft.nome2 || (draft.marcos && draft.marcos.some((m: { titulo?: string }) => m.titulo)) || draft.cartaTexto || draft.cartaGerada
+        if (temConteudo) {
+          setPendingDraft(draft)
+          setShowDraftModal(true)
+          return // espera a decisão do usuário
         }
-        if (draft.modoIA !== undefined) setModoIA(draft.modoIA)
-        if (draft.q1) setQ1(draft.q1)
-        if (draft.q2) setQ2(draft.q2)
-        if (draft.q3) setQ3(draft.q3)
-        if (draft.tom) setTom(draft.tom)
-        if (draft.cartaGerada) {
-          setCartaGerada(draft.cartaGerada)
-          setIaVisible(true)
-        }
-        if (draft.cartaTexto) setCartaTexto(draft.cartaTexto)
-        if (draft.cartaPara) setCartaPara(draft.cartaPara)
-        if (draft.cartaAss) setCartaAss(draft.cartaAss)
-        if (draft.spotifyUrl) {
-          setSpotifyUrl(draft.spotifyUrl)
-          const match = draft.spotifyUrl.match(/track\/([a-zA-Z0-9]+)/)
-          setSpotifyTrackId(match ? match[1] : '')
-        }
-        if (draft.musicaNome) setMusicaNome(draft.musicaNome)
-        if (draft.musicaArtista) setMusicaArtista(draft.musicaArtista)
-        if (draft.step !== undefined) setStep(draft.step)
       }
     } catch (e) {
       console.error('Erro ao ler rascunho:', e)
     }
+    setDraftLoaded(true) // sem rascunho — começa do zero e já habilita autosave
   }, [])
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function aplicarRascunho(draft: any) {
+    if (draft.nome1) setNome1(draft.nome1)
+    if (draft.nome2) setNome2(draft.nome2)
+    if (draft.apelido1) setApelido1(draft.apelido1)
+    if (draft.apelido2) setApelido2(draft.apelido2)
+    if (draft.dataInicio) setDataInicio(draft.dataInicio)
+    if (draft.frase) setFrase(draft.frase)
+    if (draft.marcos && draft.marcos.length > 0) {
+      const cleanMarcos = draft.marcos.map((m: { data?: string; titulo?: string; desc?: string }) => ({
+        data: m.data ?? '', titulo: m.titulo ?? '', desc: m.desc ?? ''
+      }))
+      setMarcos(cleanMarcos)
+      setMarcoFiles(Array(cleanMarcos.length).fill(null))
+    }
+    if (draft.modoIA !== undefined) setModoIA(draft.modoIA)
+    if (draft.q1) setQ1(draft.q1)
+    if (draft.q2) setQ2(draft.q2)
+    if (draft.q3) setQ3(draft.q3)
+    if (draft.tom) setTom(draft.tom)
+    if (draft.cartaGerada) { setCartaGerada(draft.cartaGerada); setIaVisible(true) }
+    if (draft.cartaTexto) setCartaTexto(draft.cartaTexto)
+    if (draft.cartaPara) setCartaPara(draft.cartaPara)
+    if (draft.cartaAss) setCartaAss(draft.cartaAss)
+    if (draft.spotifyUrl) {
+      setSpotifyUrl(draft.spotifyUrl)
+      const match = draft.spotifyUrl.match(/track\/([a-zA-Z0-9]+)/)
+      setSpotifyTrackId(match ? match[1] : '')
+    }
+    if (draft.musicaNome) setMusicaNome(draft.musicaNome)
+    if (draft.musicaArtista) setMusicaArtista(draft.musicaArtista)
+    // Nunca restaura direto no checkout (step 5) — no máximo até a música (4)
+    if (draft.step !== undefined) setStep(Math.min(draft.step, 4))
+  }
+
+  function continuarRascunho() {
+    if (pendingDraft) aplicarRascunho(pendingDraft)
+    setShowDraftModal(false)
+    setDraftLoaded(true)
+  }
+  function comecarNovo() {
+    try { localStorage.removeItem('form_casal_draft') } catch {}
+    setPendingDraft(null)
+    setShowDraftModal(false)
+    setStep(0)
+    setDraftLoaded(true)
+  }
+
   // Salva automaticamente a cada alteração de estado relevante
+  // (só após a decisão do usuário sobre o rascunho, p/ não sobrescrever antes)
   useEffect(() => {
+    if (!draftLoaded) return
     const draft = {
       nome1, nome2, apelido1, apelido2, dataInicio, frase,
       marcos: marcos.map(m => ({ data: m.data, titulo: m.titulo, desc: m.desc })),
@@ -135,6 +162,7 @@ export default function FormularioClient() {
       console.error('Erro ao salvar rascunho:', e)
     }
   }, [
+    draftLoaded,
     nome1, nome2, apelido1, apelido2, dataInicio, frase, marcos,
     modoIA, q1, q2, q3, tom, cartaGerada, cartaTexto, cartaPara, cartaAss,
     spotifyUrl, musicaNome, musicaArtista, step
@@ -263,6 +291,29 @@ export default function FormularioClient() {
 
   return (
     <div className="form-root">
+      {/* Modal de rascunho */}
+      {showDraftModal && (
+        <div className="draft-overlay">
+          <div className="draft-modal">
+            <div className="draft-modal-icon">💌</div>
+            <h2 className="draft-modal-title">Você tem um rascunho salvo</h2>
+            <p className="draft-modal-sub">
+              {pendingDraft?.nome1 && pendingDraft?.nome2
+                ? <>Encontramos a página de <strong>{pendingDraft.nome1} &amp; {pendingDraft.nome2}</strong> que você começou. Quer continuar de onde parou?</>
+                : <>Encontramos uma página que você começou a criar. Quer continuar de onde parou?</>}
+            </p>
+            <div className="draft-modal-actions">
+              <button className="draft-btn-primary" onClick={continuarRascunho}>
+                Continuar de onde parei
+              </button>
+              <button className="draft-btn-ghost" onClick={comecarNovo}>
+                Começar uma nova página
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Fairy lights */}
       <div className="form-fairy-lights">
         <div className="wire" />
