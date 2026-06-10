@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import QRCode from 'qrcode'
 import { supabaseAdmin } from '@/lib/supabase'
 import { CasalCompleto } from '@/lib/types'
 import { getBaseUrl } from '@/lib/baseUrl'
@@ -54,5 +55,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function CasalPage({ params }: { params: { slug: string } }) {
   const casal = await getCasal(params.slug)
   if (!casal) notFound()
-  return <CasalPageClient casal={casal} />
+
+  // QR Code do link da página (para compartilhar)
+  const link = `${getBaseUrl()}/${casal.slug}`
+  let qrDataUrl = ''
+  try {
+    qrDataUrl = await QRCode.toDataURL(link, {
+      width: 400, margin: 2,
+      color: { dark: '#c02744', light: '#ffffff' },
+    })
+  } catch { /* segue sem QR se falhar */ }
+
+  return <CasalPageClient casal={casal} qrDataUrl={qrDataUrl} pageLink={link} />
 }

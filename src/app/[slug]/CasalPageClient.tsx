@@ -36,7 +36,7 @@ interface CounterState {
 }
 
 // ─────────────────────────────────────────────────────────────
-export default function CasalPageClient({ casal }: { casal: CasalCompleto }) {
+export default function CasalPageClient({ casal, qrDataUrl = '', pageLink = '' }: { casal: CasalCompleto; qrDataUrl?: string; pageLink?: string }) {
   const [opened, setOpened] = useState(false)
   const [introHidden, setIntroHidden] = useState(false)
   const [envelopeOpen, setEnvelopeOpen] = useState(false)
@@ -428,6 +428,29 @@ export default function CasalPageClient({ casal }: { casal: CasalCompleto }) {
             <div className="heart-glow-ring" />
             <span className="heart-big">🌹</span>
           </div>
+
+          {/* QR Code para compartilhar */}
+          {qrDataUrl && (
+            <div className="share-qr">
+              <p className="share-qr-label">aponte a câmera e compartilhe esta página</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={qrDataUrl} alt="QR Code da página" className="share-qr-img" width={160} height={160} />
+              {pageLink && (
+                <button
+                  className="share-qr-link"
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({ title: `${casal.nome1} & ${casal.nome2} ♡`, url: pageLink }).catch(() => {})
+                    } else {
+                      navigator.clipboard?.writeText(pageLink)
+                    }
+                  }}
+                >
+                  ♥ Compartilhar nossa página
+                </button>
+              )}
+            </div>
+          )}
         </section>
       </main>
 

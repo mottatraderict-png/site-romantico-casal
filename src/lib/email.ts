@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import QRCode from 'qrcode'
 import { getBaseUrl } from '@/lib/baseUrl'
 
 function getResend() {
@@ -18,6 +19,15 @@ export async function enviarEmailPagina(
   const resend = getResend()
   const link = `${BASE_URL()}/${slug}`
   const domainLabel = BASE_URL().replace(/^https?:\/\//, '')
+
+  // Gera o QR Code do link como PNG (anexo inline via cid)
+  let qrBuffer: Buffer | null = null
+  try {
+    const dataUrl = await QRCode.toDataURL(link, {
+      width: 400, margin: 2, color: { dark: '#c02744', light: '#ffffff' },
+    })
+    qrBuffer = Buffer.from(dataUrl.split(',')[1], 'base64')
+  } catch { /* segue sem QR */ }
 
   // Versão texto-plano — essencial para reduzir score de spam
   const text = `Olá!
@@ -72,6 +82,16 @@ Equipe ${domainLabel}`
             <a href="${link}" target="_blank" style="color:#c02744;text-decoration:underline">${link}</a>
           </p>
 
+          ${qrBuffer ? `
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 28px">
+            <tr><td style="text-align:center">
+              <p style="font-family:Georgia,serif;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#a87880;margin:0 0 12px">QR Code para compartilhar</p>
+              <img src="cid:qrcode-pagina" alt="QR Code da página" width="180" height="180" style="display:block;margin:0 auto;border:8px solid #ffffff;border-radius:12px;box-shadow:0 4px 16px rgba(192,39,74,0.1)" />
+              <p style="font-family:Georgia,serif;font-size:12px;color:#a87880;font-style:italic;margin:10px 0 0">imprima ou mostre na tela para a pessoa amada ♡</p>
+            </td></tr>
+          </table>
+          ` : ''}
+
           <p style="font-family:Georgia,serif;font-size:13px;color:#6a3840;font-style:italic;line-height:1.7;margin:0">
             Guarde este link — é dele que você vai compartilhar<br>a surpresa com quem você ama. ♡
           </p>
@@ -84,5 +104,8 @@ Equipe ${domainLabel}`
   </table>
 </body>
 </html>`,
+    attachments: qrBuffer
+      ? [{ filename: 'qrcode.png', content: qrBuffer, contentId: 'qrcode-pagina' }]
+      : undefined,
   })
 }
