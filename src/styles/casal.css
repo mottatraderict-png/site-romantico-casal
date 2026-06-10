@@ -549,3 +549,13 @@
   transition: transform 0.15s ease, opacity 0.2s ease;
 }
 .share-qr-link:hover { transform: translateY(-2px); opacity: 0.94; }
+
+/* botões do QR (compartilhar + baixar) */
+.share-qr-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.share-qr-download {
+  background: #fff; color: var(--rose); border: 1.5px solid var(--rose);
+  border-radius: 99px; padding: 13px 24px; cursor: pointer;
+  font-family: var(--body); font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+.share-qr-download:hover { transform: translateY(-2px); background: var(--rose-pale); }

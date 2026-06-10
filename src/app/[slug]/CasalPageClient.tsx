@@ -435,20 +435,33 @@ export default function CasalPageClient({ casal, qrDataUrl = '', pageLink = '' }
               <p className="share-qr-label">aponte a câmera e compartilhe esta página</p>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={qrDataUrl} alt="QR Code da página" className="share-qr-img" width={160} height={160} />
-              {pageLink && (
+              <div className="share-qr-actions">
+                {pageLink && (
+                  <button
+                    className="share-qr-link"
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({ title: `${casal.nome1} & ${casal.nome2} ♡`, url: pageLink }).catch(() => {})
+                      } else {
+                        navigator.clipboard?.writeText(pageLink)
+                      }
+                    }}
+                  >
+                    ♥ Compartilhar
+                  </button>
+                )}
                 <button
-                  className="share-qr-link"
+                  className="share-qr-download"
                   onClick={() => {
-                    if (navigator.share) {
-                      navigator.share({ title: `${casal.nome1} & ${casal.nome2} ♡`, url: pageLink }).catch(() => {})
-                    } else {
-                      navigator.clipboard?.writeText(pageLink)
-                    }
+                    const a = document.createElement('a')
+                    a.href = qrDataUrl
+                    a.download = `qrcode-${casal.slug}.png`
+                    a.click()
                   }}
                 >
-                  ♥ Compartilhar nossa página
+                  ⬇ Baixar QR Code
                 </button>
-              )}
+              </div>
             </div>
           )}
         </section>
