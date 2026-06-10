@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demo Anúncio · Carta de Amor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Great+Vibes&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root{
+    --bg:#fdf8f5; --rose:#c02744; --rose-light:#e05070; --rose-pale:#fdeef1;
+    --gold:#9a6818; --text:#1e0a0f; --text-soft:#6a3840; --muted:#a87880;
+    --serif:'Cormorant Garamond',Georgia,serif; --script:'Great Vibes',cursive; --body:'Montserrat',sans-serif;
+  }
+  body{
+    background:#150d10; min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--body); gap:40px; flex-wrap:wrap; padding:30px;
+  }
+  /* moldura do celular 9:16 */
+  .phone{
+    width:340px; height:720px; border-radius:44px; background:#1a0e12;
+    padding:12px; box-shadow:0 30px 80px rgba(0,0,0,.5), 0 0 0 2px #2a1a20;
+    position:relative;
+  }
+  .notch{ position:absolute; top:18px; left:50%; transform:translateX(-50%); width:110px; height:26px; background:#1a0e12; border-radius:0 0 16px 16px; z-index:50; }
+  .screen{
+    width:100%; height:100%; border-radius:34px; overflow:hidden; position:relative;
+    background:var(--bg); color:var(--text);
+  }
+  .stage{ position:absolute; inset:0; }
+
+  /* ── corações de fundo ── */
+  .hearts{ position:absolute; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
+  .hearts b{ position:absolute; color:rgba(192,39,74,.18); font-size:14px; animation:float 6s linear infinite; }
+  @keyframes float{ 0%{ transform:translateY(110%) scale(.6); opacity:0 } 15%{opacity:1} 85%{opacity:1} 100%{ transform:translateY(-20%) scale(1); opacity:0 } }
+
+  /* fairy lights */
+  .lights{ display:flex; justify-content:space-around; padding:10px 14px 0; position:relative; z-index:3;}
+  .lights i{ width:7px; height:10px; border-radius:50% 50% 45% 45%; display:block; animation:tw 2s ease-in-out infinite; }
+  .lights i:nth-child(3n+1){ background:var(--rose); box-shadow:0 0 6px var(--rose); }
+  .lights i:nth-child(3n+2){ background:#e8a030; box-shadow:0 0 6px #e8a030; }
+  .lights i:nth-child(3n){ background:#c060a0; box-shadow:0 0 6px #c060a0; }
+  @keyframes tw{ 0%,100%{opacity:1} 50%{opacity:.2} }
+
+  /* ── slides ── */
+  .slide{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:30px; opacity:0; z-index:2; }
+  .slide.on{ opacity:1; }
+
+  .eyebrow{ font-size:9px; letter-spacing:.35em; text-transform:uppercase; color:var(--gold); margin-bottom:14px; }
+
+  /* envelope */
+  .env{ width:150px; height:108px; position:relative; transform-style:preserve-3d; }
+  .env .body{ position:absolute; inset:0; background:linear-gradient(160deg,#fff2ea,#f2ddd0); border:1px solid rgba(192,39,74,.25); border-radius:5px; box-shadow:0 16px 40px rgba(0,0,0,.15); }
+  .env .flap{ position:absolute; top:0; left:0; right:0; height:54%; background:linear-gradient(160deg,#f5e0d4,#eed8c8); clip-path:polygon(0 0,50% 100%,100% 0); transform-origin:top; transition:transform 1s cubic-bezier(.23,1,.32,1); z-index:3; }
+  .env.open .flap{ transform:rotateX(-180deg); }
+  .env .seal{ position:absolute; top:46%; left:50%; transform:translate(-50%,-40%); width:34px; height:34px; border-radius:50%; background:radial-gradient(circle at 40% 35%,var(--rose-light),var(--rose) 60%,#8c1a2e); display:flex; align-items:center; justify-content:center; color:#fff; font-size:15px; z-index:4; box-shadow:0 0 14px rgba(192,39,74,.5); transition:opacity .5s; }
+  .env.open .seal{ opacity:0; }
+  .tap{ margin-top:24px; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); animation:blink 1.4s infinite; }
+  @keyframes blink{ 0%,100%{opacity:.5} 50%{opacity:1} }
+
+  .names{ font-family:var(--serif); font-size:52px; font-weight:400; line-height:.95; color:var(--text); }
+  .names .amp{ display:block; font-style:italic; font-size:.5em; color:var(--rose); margin:4px 0; }
+  .date{ font-size:11px; font-style:italic; color:var(--text-soft); margin-top:16px; }
+
+  /* contador */
+  .counter{ display:flex; gap:8px; }
+  .cnt{ background:#fff; border:1px solid rgba(192,39,74,.12); border-radius:12px; padding:14px 10px; min-width:56px; box-shadow:0 4px 14px rgba(0,0,0,.05); }
+  .cnt b{ display:block; font-family:var(--serif); font-size:30px; color:var(--rose); line-height:1; }
+  .cnt span{ font-size:7px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:6px; display:block; }
+
+  /* polaroids */
+  .polas{ display:flex; gap:0; }
+  .pola{ background:#fff; padding:8px 8px 22px; box-shadow:0 8px 20px rgba(0,0,0,.14); }
+  .pola:nth-child(1){ transform:rotate(-6deg); } .pola:nth-child(2){ transform:rotate(3deg); margin:0 -8px; z-index:2;} .pola:nth-child(3){ transform:rotate(7deg); }
+  .pola .img{ width:78px; height:78px; display:flex; align-items:center; justify-content:center; font-size:30px; background:var(--rose-pale); }
+  .pola .cap{ font-family:var(--script); font-size:14px; color:#8c1a2e; text-align:center; margin-top:4px; }
+
+  /* carta */
+  .letter{ background:linear-gradient(160deg,#fff8f4,#fdf0e8); border:1px solid rgba(192,39,74,.12); border-radius:4px; padding:30px 26px; max-width:260px; box-shadow:0 12px 30px rgba(0,0,0,.1); position:relative; }
+  .letter:before{ content:''; position:absolute; inset:8px; border:1px solid rgba(154,104,24,.18); }
+  .letter .salut{ font-family:var(--script); font-size:30px; color:#8c1a2e; margin-bottom:12px; }
+  .letter p{ font-size:11.5px; line-height:1.9; color:var(--text-soft); }
+  .letter .sig{ font-family:var(--script); font-size:26px; color:var(--rose); margin-top:14px; display:block; }
+
+  /* musica */
+  .music{ background:#fff; border:1px solid rgba(192,39,74,.12); border-radius:12px; padding:24px 28px; box-shadow:0 10px 28px rgba(0,0,0,.08); }
+  .music .ic{ font-size:28px; color:var(--rose); opacity:.6; }
+  .music .t{ font-family:var(--serif); font-size:22px; font-style:italic; color:var(--text); margin-top:8px; }
+  .music .a{ font-size:11px; color:var(--text-soft); margin-top:2px; }
+  .bar{ display:flex; gap:3px; justify-content:center; margin-top:16px; align-items:flex-end; height:26px; }
+  .bar i{ width:4px; background:var(--rose); border-radius:2px; animation:eq .8s ease-in-out infinite; }
+  .bar i:nth-child(2){ animation-delay:.15s } .bar i:nth-child(3){ animation-delay:.3s } .bar i:nth-child(4){ animation-delay:.45s } .bar i:nth-child(5){ animation-delay:.1s }
+  @keyframes eq{ 0%,100%{ height:8px } 50%{ height:24px } }
+
+  /* CTA final */
+  .cta .logo{ font-size:40px; }
+  .cta h2{ font-family:var(--serif); font-size:30px; font-style:italic; color:var(--text); margin:10px 0; }
+  .cta p{ font-size:12px; color:var(--text-soft); margin-bottom:18px; }
+  .cta .btn{ background:linear-gradient(135deg,var(--rose-light),var(--rose)); color:#fff; padding:13px 26px; border-radius:99px; font-size:13px; font-weight:600; box-shadow:0 8px 22px rgba(192,39,74,.35); }
+  .cta .url{ font-size:12px; color:var(--rose); margin-top:14px; letter-spacing:.05em; }
+
+  .fade-up{ animation:fadeUp .9s ease both; }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(20px)} to{opacity:1; transform:none} }
+
+  .hint{ color:#8a6; font-family:var(--body); font-size:13px; max-width:280px; line-height:1.7; }
+  .hint h3{ color:#e8a; font-size:16px; margin-bottom:10px; }
+  .hint code{ background:#000; padding:2px 6px; border-radius:4px; color:#fda; }
+  @media(max-width:760px){ .hint{ display:none; } }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+      <div class="lights"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="hearts" id="hearts"></div>
+      <div class="stage" id="stage">
+
+        <div class="slide" data-s="0">
+          <div class="eyebrow">uma história de amor</div>
+          <div class="env" id="env">
+            <div class="body"></div>
+            <div class="flap"></div>
+            <div class="seal">♥</div>
+          </div>
+          <div class="tap">toque para abrir</div>
+        </div>
+
+        <div class="slide" data-s="1">
+          <div class="eyebrow">para sempre</div>
+          <div class="names">Ana<span class="amp">&amp;</span>Pedro</div>
+          <div class="date">juntos desde 14 de janeiro de 2022</div>
+        </div>
+
+        <div class="slide" data-s="2">
+          <div class="eyebrow">vivendo juntos há</div>
+          <div class="counter">
+            <div class="cnt"><b>4</b><span>anos</span></div>
+            <div class="cnt"><b>2</b><span>meses</span></div>
+            <div class="cnt"><b>18</b><span>dias</span></div>
+            <div class="cnt"><b id="sec">07</b><span>seg</span></div>
+          </div>
+        </div>
+
+        <div class="slide" data-s="3">
+          <div class="eyebrow">nossas memórias</div>
+          <div class="polas">
+            <div class="pola"><div class="img">📷</div><div class="cap">nós dois</div></div>
+            <div class="pola"><div class="img">🌅</div><div class="cap">aquele dia</div></div>
+            <div class="pola"><div class="img">💑</div><div class="cap">te amo</div></div>
+          </div>
+        </div>
+
+        <div class="slide" data-s="4">
+          <div class="eyebrow">a cartinha</div>
+          <div class="letter">
+            <div class="salut">Meu amor,</div>
+            <p>Você é a pessoa que transforma qualquer lugar em lar. Cada instante ao seu lado me faz querer viver mais intensamente...</p>
+            <span class="sig">Com todo meu amor, Pedro</span>
+          </div>
+        </div>
+
+        <div class="slide" data-s="5">
+          <div class="eyebrow">nossa trilha sonora</div>
+          <div class="music">
+            <div class="ic">♪</div>
+            <div class="t">Perfect</div>
+            <div class="a">Ed Sheeran</div>
+            <div class="bar"><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+        </div>
+
+        <div class="slide cta" data-s="6">
+          <div class="logo">🌹</div>
+          <h2>Surpreenda quem<br>você ama</h2>
+          <p>Crie a página de vocês em minutos</p>
+          <div class="btn">Criar minha página ♥</div>
+          <div class="url">cartadeamor.site</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">
+    <h3>🎬 Como gerar o vídeo/GIF</h3>
+    <p>1. Abra este arquivo no navegador (já está tocando em loop).</p>
+    <p>2. Grave a tela só da moldura do celular:</p>
+    <p>• <b>Mac:</b> <code>Cmd+Shift+5</code> → gravar seleção<br>
+       • <b>Windows:</b> <code>Win+G</code> (Xbox Game Bar)<br>
+       • Ou a extensão <b>Loom</b>.</p>
+    <p>3. Para virar GIF: jogue o MP4 em <code>ezgif.com/video-to-gif</code>.</p>
+    <p>Cada ciclo completo dura ~21s. Grave 1 ciclo.</p>
+  </div>
+
+<script>
+  // corações flutuando
+  const hearts = document.getElementById('hearts');
+  setInterval(()=>{
+    const b = document.createElement('b');
+    b.textContent = ['♥','♡','❤'][Math.floor(Math.random()*3)];
+    b.style.left = (Math.random()*90)+'%';
+    b.style.fontSize = (10+Math.random()*12)+'px';
+    b.style.animationDuration = (5+Math.random()*3)+'s';
+    hearts.appendChild(b);
+    setTimeout(()=>b.remove(), 8000);
+  }, 700);
+
+  // contador de segundos animado
+  let sec = 7;
+  setInterval(()=>{ sec=(sec+1)%60; const el=document.getElementById('sec'); if(el) el.textContent=String(sec).padStart(2,'0'); }, 1000);
+
+  // sequência de slides
+  const slides = [...document.querySelectorAll('.slide')];
+  const env = document.getElementById('env');
+  const DUR = [3200, 2800, 2800, 3000, 4200, 3000, 3200]; // ms por slide
+  let i = 0;
+
+  function show(idx){
+    slides.forEach(s=>s.classList.remove('on'));
+    const cur = slides[idx];
+    cur.classList.add('on');
+    // re-trigger fade nos filhos
+    [...cur.children].forEach((c,k)=>{ c.classList.remove('fade-up'); void c.offsetWidth; c.style.animationDelay=(k*0.12)+'s'; c.classList.add('fade-up'); });
+    // abre o envelope no primeiro slide
+    if(idx===0){ env.classList.remove('open'); setTimeout(()=>env.classList.add('open'), 1400); }
+    setTimeout(()=>{ i=(idx+1)%slides.length; show(i); }, DUR[idx]);
+  }
+  show(0);
+</script>
+</body>
+</html>
